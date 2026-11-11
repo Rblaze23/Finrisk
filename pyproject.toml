@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finrisk"
+version = "0.1.0"
+description = "Credit risk intelligence and model validation platform"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas", "numpy", "scikit-learn", "xgboost", "lightgbm", "shap",
+    "mlflow", "fastapi", "uvicorn", "streamlit", "psycopg2-binary",
+    "sqlalchemy", "python-dotenv", "pydantic", "scipy", "matplotlib",
+    "groq", "pytest",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
