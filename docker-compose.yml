@@ -1,1 +1,50 @@
-# TODO: postgres, mlflow, api, dashboard
+# FinRisk Lab - local infrastructure.
+# Phase 0: postgres + mlflow. The api and dashboard services are added in Phase 5.
+name: finrisk
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: finrisk-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-finrisk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finrisk}
+      POSTGRES_DB: ${POSTGRES_DB:-finrisk}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Init scripts run once, on first start of an empty volume, in file-name order.
+      - ./docker/initdb/00_create_mlflow_db.sql:/docker-entrypoint-initdb.d/00_create_mlflow_db.sql:ro
+      - ./sql/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finrisk} -d ${POSTGRES_DB:-finrisk}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mlflow
+    container_name: finrisk-mlflow
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri postgresql+psycopg2://${POSTGRES_USER:-finrisk}:${POSTGRES_PASSWORD:-finrisk}@postgres:5432/mlflow
+      --artifacts-destination /mlflow/artifacts
+      --serve-artifacts
+    volumes:
+      - mlflow_artifacts:/mlflow/artifacts
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  mlflow_artifacts:

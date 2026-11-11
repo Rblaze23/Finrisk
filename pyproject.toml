@@ -9,7 +9,7 @@ description = "Credit risk intelligence and model validation platform"
 requires-python = ">=3.10"
 dependencies = [
     "pandas", "numpy", "scikit-learn", "xgboost", "lightgbm", "shap",
-    "mlflow", "fastapi", "uvicorn", "streamlit", "psycopg2-binary",
+    "mlflow>=3,<4", "fastapi", "uvicorn", "streamlit", "psycopg2-binary",
     "sqlalchemy", "python-dotenv", "pydantic", "scipy", "matplotlib",
     "groq", "pytest",
 ]
