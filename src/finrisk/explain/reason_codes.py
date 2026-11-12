@@ -48,9 +48,10 @@ def format_value(v) -> str:
     return str(v)
 
 
-def top_reasons(contributions: pd.Series, values: pd.Series, k: int = 5) -> list[dict]:
-    """Top-k features that INCREASE the applicant's risk (positive log-odds contribution)."""
-    pos = contributions[contributions > 0].sort_values(ascending=False).head(k)
+def top_reasons(contributions: pd.Series, values: pd.Series, k: int = 5,
+                min_impact: float = 0.01) -> list[dict]:
+    """Top-k features that INCREASE the applicant's risk (log-odds contribution > min_impact)."""
+    pos = contributions[contributions > min_impact].sort_values(ascending=False).head(k)
     return [
         {"feature": f, "label": REASON_LABELS.get(f, f),
          "value": format_value(values.get(f)), "impact": float(c)}
