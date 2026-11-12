@@ -23,14 +23,17 @@ def main() -> None:
     with engine.connect() as c:
         exists = c.execute(text("SELECT to_regclass('raw.loans')")).scalar()
     if exists is None:
-        raise SystemExit("raw.loans not found. Run: python -m finrisk.data.ingest --sample")
+        raise SystemExit(
+            "raw.loans not found. Run: python -m finrisk.data.ingest --sample")
 
     print("Building staging.loans_clean ...")
-    execute_sql((settings.sql_dir / "02_staging.sql").read_text(encoding="utf-8"))
+    execute_sql(
+        (settings.sql_dir / "02_staging.sql").read_text(encoding="utf-8"))
 
     with engine.connect() as c:
         n_raw = c.execute(text("SELECT COUNT(*) FROM raw.loans")).scalar()
-        n_clean = c.execute(text("SELECT COUNT(*) FROM staging.loans_clean")).scalar()
+        n_clean = c.execute(
+            text("SELECT COUNT(*) FROM staging.loans_clean")).scalar()
         status = pd.read_sql(
             text("""SELECT loan_status, COUNT(*) AS n
                     FROM raw.loans GROUP BY 1 ORDER BY 2 DESC"""), c)
