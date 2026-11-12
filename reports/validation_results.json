@@ -1,6 +1,6 @@
 {
-  "run_id": "val_20261112_132322",
-  "generated_at": "2026-11-12T13:23:22",
+  "run_id": "val_20261112_134531",
+  "generated_at": "2026-11-12T13:45:31",
   "thresholds": {
     "calibration_ratio_dev": {
       "warn": 0.1,
@@ -25,6 +25,26 @@
     "psi": {
       "warn": 0.1,
       "fail": 0.25
+    },
+    "vintage_gini_loss": {
+      "warn": 0.03,
+      "fail": 0.1
+    },
+    "single_feature_gini": {
+      "warn": 0.4,
+      "fail": 0.5
+    },
+    "explanation_rank_corr": {
+      "warn": 0.8,
+      "fail": 0.6
+    },
+    "fairness_group_dev": {
+      "warn": 0.1,
+      "fail": 0.2
+    },
+    "geo_importance_share": {
+      "warn": 0.02,
+      "fail": 0.05
     }
   },
   "models": {
@@ -586,24 +606,26 @@
     {
       "model": "scorecard_independent",
       "test": "stability",
-      "metric": "csi_max_train_to_valid",
+      "metric": "csi_max_used_feature_train_to_valid",
       "value": 1.1917673496433514,
       "status": "fail",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail (features used by the model only)",
       "details": {
         "worst_feature": "total_rev_hi_lim",
-        "n_features_above_warn": 8,
-        "n_features_above_fail": 6,
-        "top10": [
+        "n_used_features": 11,
+        "n_used_above_warn": 3,
+        "n_used_above_fail": 3,
+        "top10_all_features": [
           {
             "feature": "total_rev_hi_lim",
             "kind": "numeric",
             "psi": 1.1917673496433514,
             "missing_expected": 0.15671475829094042,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "avg_cur_bal",
@@ -611,7 +633,8 @@
             "psi": 1.1830697183518204,
             "missing_expected": 0.15674255691768826,
             "missing_actual": 3.075598203850649e-05,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "tot_cur_bal",
@@ -619,7 +642,8 @@
             "psi": 1.182547519131231,
             "missing_expected": 0.15671475829094042,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": false
           },
           {
             "feature": "num_bc_sats",
@@ -627,7 +651,8 @@
             "psi": 0.6301433837975143,
             "missing_expected": 0.0901787451699886,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": false
           },
           {
             "feature": "initial_list_status",
@@ -635,7 +660,8 @@
             "psi": 0.3168743019939458,
             "missing_expected": 0.0,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": false
           },
           {
             "feature": "mort_acc",
@@ -643,7 +669,8 @@
             "psi": 0.2570980776775418,
             "missing_expected": 0.041871681538931976,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "mths_since_last_record",
@@ -651,7 +678,8 @@
             "psi": 0.14963169305524895,
             "missing_expected": 0.9037889528257305,
             "missing_actual": 0.8106784769637695,
-            "label": "moderate shift"
+            "label": "moderate shift",
+            "used_by_model": false
           },
           {
             "feature": "verification_status",
@@ -659,7 +687,8 @@
             "psi": 0.13650432610957183,
             "missing_expected": 0.0,
             "missing_actual": 0.0,
-            "label": "moderate shift"
+            "label": "moderate shift",
+            "used_by_model": false
           },
           {
             "feature": "bc_util",
@@ -667,7 +696,8 @@
             "psi": 0.07360002395184609,
             "missing_expected": 0.05081588969504906,
             "missing_actual": 0.011613458817740051,
-            "label": "stable"
+            "label": "stable",
+            "used_by_model": true
           },
           {
             "feature": "pub_rec",
@@ -675,14 +705,15 @@
             "psi": 0.07315009582605858,
             "missing_expected": 0.0,
             "missing_actual": 0.0,
-            "label": "stable"
+            "label": "stable",
+            "used_by_model": false
           }
         ]
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_total_rev_hi_lim_train_to_valid",
       "value": 1.1917673496433514,
       "status": "fail",
@@ -690,13 +721,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.15671475829094042,
         "missing_actual": 0.0
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_avg_cur_bal_train_to_valid",
       "value": 1.1830697183518204,
       "status": "fail",
@@ -704,55 +736,59 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.15674255691768826,
         "missing_actual": 3.075598203850649e-05
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_tot_cur_bal_train_to_valid",
       "value": 1.182547519131231,
-      "status": "fail",
+      "status": "info",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "diagnostic: feature not used by this model",
       "details": {
+        "used_by_model": false,
         "missing_expected": 0.15671475829094042,
         "missing_actual": 0.0
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_num_bc_sats_train_to_valid",
       "value": 0.6301433837975143,
-      "status": "fail",
+      "status": "info",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "diagnostic: feature not used by this model",
       "details": {
+        "used_by_model": false,
         "missing_expected": 0.0901787451699886,
         "missing_actual": 0.0
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_initial_list_status_train_to_valid",
       "value": 0.3168743019939458,
-      "status": "fail",
+      "status": "info",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "diagnostic: feature not used by this model",
       "details": {
+        "used_by_model": false,
         "missing_expected": 0.0,
         "missing_actual": 0.0
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_mort_acc_train_to_valid",
       "value": 0.2570980776775418,
       "status": "fail",
@@ -760,34 +796,37 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.041871681538931976,
         "missing_actual": 0.0
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_mths_since_last_record_train_to_valid",
       "value": 0.14963169305524895,
-      "status": "warn",
+      "status": "info",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "diagnostic: feature not used by this model",
       "details": {
+        "used_by_model": false,
         "missing_expected": 0.9037889528257305,
         "missing_actual": 0.8106784769637695
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_verification_status_train_to_valid",
       "value": 0.13650432610957183,
-      "status": "warn",
+      "status": "info",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "diagnostic: feature not used by this model",
       "details": {
+        "used_by_model": false,
         "missing_expected": 0.0,
         "missing_actual": 0.0
       }
@@ -795,24 +834,26 @@
     {
       "model": "scorecard_independent",
       "test": "stability",
-      "metric": "csi_max_train_to_oot",
+      "metric": "csi_max_used_feature_train_to_oot",
       "value": 1.1967119352332505,
       "status": "fail",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail (features used by the model only)",
       "details": {
         "worst_feature": "total_rev_hi_lim",
-        "n_features_above_warn": 9,
-        "n_features_above_fail": 6,
-        "top10": [
+        "n_used_features": 11,
+        "n_used_above_warn": 4,
+        "n_used_above_fail": 3,
+        "top10_all_features": [
           {
             "feature": "total_rev_hi_lim",
             "kind": "numeric",
             "psi": 1.1967119352332505,
             "missing_expected": 0.15671475829094042,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "tot_cur_bal",
@@ -820,7 +861,8 @@
             "psi": 1.1899701757301044,
             "missing_expected": 0.15671475829094042,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": false
           },
           {
             "feature": "avg_cur_bal",
@@ -828,7 +870,8 @@
             "psi": 1.1884054410319127,
             "missing_expected": 0.15674255691768826,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "num_bc_sats",
@@ -836,7 +879,8 @@
             "psi": 0.6434890660410659,
             "missing_expected": 0.0901787451699886,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": false
           },
           {
             "feature": "initial_list_status",
@@ -844,7 +888,8 @@
             "psi": 0.6166245231825083,
             "missing_expected": 0.0,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": false
           },
           {
             "feature": "mort_acc",
@@ -852,7 +897,8 @@
             "psi": 0.2632352168182509,
             "missing_expected": 0.041871681538931976,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "verification_status",
@@ -860,7 +906,8 @@
             "psi": 0.20328872499489592,
             "missing_expected": 0.0,
             "missing_actual": 0.0,
-            "label": "moderate shift"
+            "label": "moderate shift",
+            "used_by_model": false
           },
           {
             "feature": "mths_since_last_record",
@@ -868,7 +915,8 @@
             "psi": 0.19293769322106785,
             "missing_expected": 0.9037889528257305,
             "missing_actual": 0.8133387038646626,
-            "label": "moderate shift"
+            "label": "moderate shift",
+            "used_by_model": false
           },
           {
             "feature": "bc_util",
@@ -876,7 +924,8 @@
             "psi": 0.10559915926400779,
             "missing_expected": 0.05081588969504906,
             "missing_actual": 0.010698663727007413,
-            "label": "moderate shift"
+            "label": "moderate shift",
+            "used_by_model": true
           },
           {
             "feature": "pub_rec",
@@ -884,14 +933,15 @@
             "psi": 0.06948386122049369,
             "missing_expected": 0.0,
             "missing_actual": 0.0,
-            "label": "stable"
+            "label": "stable",
+            "used_by_model": false
           }
         ]
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_total_rev_hi_lim_train_to_oot",
       "value": 1.1967119352332505,
       "status": "fail",
@@ -899,27 +949,29 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.15671475829094042,
         "missing_actual": 0.0
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_tot_cur_bal_train_to_oot",
       "value": 1.1899701757301044,
-      "status": "fail",
+      "status": "info",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "diagnostic: feature not used by this model",
       "details": {
+        "used_by_model": false,
         "missing_expected": 0.15671475829094042,
         "missing_actual": 0.0
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_avg_cur_bal_train_to_oot",
       "value": 1.1884054410319127,
       "status": "fail",
@@ -927,41 +979,44 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.15674255691768826,
         "missing_actual": 0.0
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_num_bc_sats_train_to_oot",
       "value": 0.6434890660410659,
-      "status": "fail",
+      "status": "info",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "diagnostic: feature not used by this model",
       "details": {
+        "used_by_model": false,
         "missing_expected": 0.0901787451699886,
         "missing_actual": 0.0
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_initial_list_status_train_to_oot",
       "value": 0.6166245231825083,
-      "status": "fail",
+      "status": "info",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "diagnostic: feature not used by this model",
       "details": {
+        "used_by_model": false,
         "missing_expected": 0.0,
         "missing_actual": 0.0
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_mort_acc_train_to_oot",
       "value": 0.2632352168182509,
       "status": "fail",
@@ -969,41 +1024,44 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.041871681538931976,
         "missing_actual": 0.0
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_verification_status_train_to_oot",
       "value": 0.20328872499489592,
-      "status": "warn",
+      "status": "info",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "diagnostic: feature not used by this model",
       "details": {
+        "used_by_model": false,
         "missing_expected": 0.0,
         "missing_actual": 0.0
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_mths_since_last_record_train_to_oot",
       "value": 0.19293769322106785,
-      "status": "warn",
+      "status": "info",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "diagnostic: feature not used by this model",
       "details": {
+        "used_by_model": false,
         "missing_expected": 0.9037889528257305,
         "missing_actual": 0.8133387038646626
       }
     },
     {
       "model": "scorecard_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_bc_util_train_to_oot",
       "value": 0.10559915926400779,
       "status": "warn",
@@ -1011,6 +1069,7 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.05081588969504906,
         "missing_actual": 0.010698663727007413
       }
@@ -1041,6 +1100,733 @@
       "details": {
         "train_dr": 0.12704667389430963,
         "oot_dr": 0.14886264866125373
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "sensitivity",
+      "metric": "vintage_sensitive_features",
+      "value": 6.0,
+      "status": "info",
+      "warn": null,
+      "fail": null,
+      "rule": "",
+      "details": {
+        "features": [
+          "tot_cur_bal",
+          "total_rev_hi_lim",
+          "avg_cur_bal",
+          "num_bc_sats",
+          "bc_util",
+          "mort_acc"
+        ],
+        "missing_share_by_year": [
+          {
+            "spread": 0.5187485622268231,
+            "2012": 0.5187485622268231,
+            "2013": 0.0
+          },
+          {
+            "spread": 0.5187485622268231,
+            "2012": 0.5187485622268231,
+            "2013": 0.0
+          },
+          {
+            "spread": 0.5187087303174805,
+            "2012": 0.5187485622268231,
+            "2013": 3.9831909342574336e-05
+          },
+          {
+            "spread": 0.29850471589602023,
+            "2012": 0.29850471589602023,
+            "2013": 0.0
+          },
+          {
+            "spread": 0.14055254940094827,
+            "2012": 0.14890729238555325,
+            "2013": 0.008354742984604967
+          },
+          {
+            "spread": 0.13860133425350818,
+            "2012": 0.13860133425350818,
+            "2013": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "sensitivity",
+      "metric": "oot_gini_without_vintage_features",
+      "value": 0.29141851107141803,
+      "status": "info",
+      "warn": null,
+      "fail": null,
+      "rule": "",
+      "details": {
+        "removed": [
+          "tot_cur_bal",
+          "total_rev_hi_lim",
+          "avg_cur_bal",
+          "num_bc_sats",
+          "bc_util",
+          "mort_acc"
+        ],
+        "gini_original": 0.29818048922704543,
+        "ks_original": 0.2140934830960785,
+        "ks_reduced": 0.20953029843733356,
+        "calibration_ratio_original": 1.2042546324413235,
+        "calibration_ratio_reduced": 1.1807604641982898,
+        "removed_features_used_by_original": [
+          "avg_cur_bal",
+          "bc_util",
+          "mort_acc",
+          "total_rev_hi_lim"
+        ]
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "sensitivity",
+      "metric": "vintage_gini_loss",
+      "value": 0.0226774668361302,
+      "status": "pass",
+      "warn": 0.03,
+      "fail": 0.1,
+      "rule": "relative OOT Gini loss when vintage-sensitive features are removed: <= 3% pass, <= 10% warn, else fail",
+      "details": {
+        "gini_original": 0.29818048922704543,
+        "gini_reduced": 0.29141851107141803
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "leakage",
+      "metric": "post_origination_features_in_model",
+      "value": 0.0,
+      "status": "pass",
+      "warn": 0,
+      "fail": 0,
+      "rule": "no model input may be a post-origination column",
+      "details": {
+        "forbidden_columns_checked": [
+          "out_prncp",
+          "total_pymnt",
+          "total_rec_prncp",
+          "total_rec_int",
+          "total_rec_late_fee",
+          "recoveries",
+          "collection_recovery_fee",
+          "last_pymnt_d",
+          "last_pymnt_amnt",
+          "last_credit_pull_d",
+          "last_fico_range_high",
+          "last_fico_range_low",
+          "debt_settlement_flag"
+        ],
+        "found": []
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "leakage",
+      "metric": "max_single_feature_gini",
+      "value": 0.20297349123541664,
+      "status": "pass",
+      "warn": 0.4,
+      "fail": 0.5,
+      "rule": "strongest single input Gini <= 0.4 pass, <= 0.5 warn, else fail (a single input this predictive usually means leakage)",
+      "details": {
+        "strongest": "fico_mid",
+        "top5": [
+          {
+            "feature": "fico_mid",
+            "gini": 0.20297349123541664
+          },
+          {
+            "feature": "avg_cur_bal",
+            "gini": 0.14327980599476675
+          },
+          {
+            "feature": "annual_inc",
+            "gini": 0.13876174118902895
+          },
+          {
+            "feature": "dti",
+            "gini": 0.1376507467475041
+          },
+          {
+            "feature": "total_rev_hi_lim",
+            "gini": 0.1355606953310602
+          }
+        ]
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "leakage",
+      "metric": "demonstration_leaky_model_oot_gini",
+      "value": 0.9982398745706453,
+      "status": "info",
+      "warn": null,
+      "fail": null,
+      "rule": "",
+      "details": {
+        "clean_model_gini": 0.29818048922704543,
+        "inflation": 0.7000593853435999,
+        "leaky_ks": 0.9780984345370837,
+        "single_feature_gini_of_post_origination_columns": [
+          {
+            "feature": "last_fico_range_low",
+            "gini": 0.8746885933342397
+          },
+          {
+            "feature": "last_fico_range_high",
+            "gini": 0.8746723325820818
+          },
+          {
+            "feature": "recoveries",
+            "gini": 0.7195718218930978
+          },
+          {
+            "feature": "collection_recovery_fee",
+            "gini": 0.7192395328966108
+          },
+          {
+            "feature": "total_rec_prncp",
+            "gini": 0.6511887119416848
+          },
+          {
+            "feature": "last_pymnt_amnt",
+            "gini": 0.5205838182908858
+          },
+          {
+            "feature": "total_pymnt",
+            "gini": 0.5047583920148089
+          },
+          {
+            "feature": "total_rec_late_fee",
+            "gini": 0.11196977983647804
+          },
+          {
+            "feature": "out_prncp",
+            "gini": 0.0
+          }
+        ],
+        "note": "retrained with post-origination columns to show the effect; the production model excludes them"
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "explanation_stability",
+      "metric": "importance_rank_corr_train_to_valid",
+      "value": 1.0,
+      "status": "pass",
+      "warn": 0.8,
+      "fail": 0.6,
+      "rule": "Spearman rank correlation >= 0.8 pass, >= 0.6 warn, else fail",
+      "details": {
+        "top5_overlap": 1.0
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "explanation_stability",
+      "metric": "importance_rank_corr_train_to_oot",
+      "value": 1.0,
+      "status": "pass",
+      "warn": 0.8,
+      "fail": 0.6,
+      "rule": "Spearman rank correlation >= 0.8 pass, >= 0.6 warn, else fail",
+      "details": {
+        "top5_overlap": 1.0
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "explanation_stability",
+      "metric": "largest_importance_share_change_train_to_oot",
+      "value": 0.014260286908371611,
+      "status": "info",
+      "warn": null,
+      "fail": null,
+      "rule": "",
+      "details": {
+        "feature": "inq_last_6mths",
+        "importance_shares": [
+          {
+            "train": 0.22815601050890788,
+            "valid": 0.23288032932039507,
+            "oot": 0.23322285531768086,
+            "change_train_to_oot": 0.00506684480877298
+          },
+          {
+            "train": 0.17405115327100384,
+            "valid": 0.16781643265664806,
+            "oot": 0.15979086636263223,
+            "change_train_to_oot": -0.014260286908371611
+          },
+          {
+            "train": 0.12260369381520304,
+            "valid": 0.12215324890260806,
+            "oot": 0.1222059954231962,
+            "change_train_to_oot": -0.00039769839200684554
+          },
+          {
+            "train": 0.11243847095776027,
+            "valid": 0.11224803811889436,
+            "oot": 0.11335537109214161,
+            "change_train_to_oot": 0.0009169001343813377
+          },
+          {
+            "train": 0.10517448586260661,
+            "valid": 0.10541175264078878,
+            "oot": 0.10957384158251149,
+            "change_train_to_oot": 0.004399355719904879
+          },
+          {
+            "train": 0.0864380886722406,
+            "valid": 0.08592983564359334,
+            "oot": 0.08423404627975685,
+            "change_train_to_oot": -0.002204042392483757
+          },
+          {
+            "train": 0.05531095912123066,
+            "valid": 0.059116290886143924,
+            "oot": 0.06045965030900354,
+            "change_train_to_oot": 0.005148691187772884
+          },
+          {
+            "train": 0.04839503348373813,
+            "valid": 0.04863298116765502,
+            "oot": 0.051934340483098494,
+            "change_train_to_oot": 0.0035393069993603643
+          },
+          {
+            "train": 0.033378918653053126,
+            "valid": 0.032359486681429316,
+            "oot": 0.03200170824834229,
+            "change_train_to_oot": -0.001377210404710838
+          },
+          {
+            "train": 0.018074781358047964,
+            "valid": 0.017476045737344445,
+            "oot": 0.017662158351357697,
+            "change_train_to_oot": -0.00041262300669026725
+          },
+          {
+            "train": 0.015978404296207935,
+            "valid": 0.015975558244499453,
+            "oot": 0.015559166550278605,
+            "change_train_to_oot": -0.00041923774592932984
+          }
+        ]
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "fairness",
+      "metric": "oot_group_calibration_dev_addr_state",
+      "value": 0.1401524492068329,
+      "status": "warn",
+      "warn": 0.1,
+      "fail": 0.2,
+      "rule": "largest group deviation of calibration ratio from the overall ratio (groups with n >= 2000): <= 10% pass, <= 20% warn, else fail",
+      "details": {
+        "overall_ratio": 1.2042546324413235,
+        "worst_group": "IL",
+        "groups": [
+          {
+            "group": "IL",
+            "n": 11609,
+            "mean_pd": 0.12644713468450436,
+            "observed_dr": 0.1309328968903437,
+            "share_high_risk_bands": 0.18330605564648117,
+            "ratio": 1.0354753962359977,
+            "ratio_vs_overall": -0.1401524492068329,
+            "gini": 0.30425437292308954,
+            "graded": true
+          },
+          {
+            "group": "NJ",
+            "n": 10088,
+            "mean_pd": 0.11655318846733584,
+            "observed_dr": 0.15761300555114988,
+            "share_high_risk_bands": 0.14214908802537668,
+            "ratio": 1.352283945413652,
+            "ratio_vs_overall": 0.12292193775683158,
+            "gini": 0.2785859343892976,
+            "graded": true
+          },
+          {
+            "group": "GA",
+            "n": 9383,
+            "mean_pd": 0.12084832225194188,
+            "observed_dr": 0.12853032079292337,
+            "share_high_risk_bands": 0.1540019183629969,
+            "ratio": 1.063567275058782,
+            "ratio_vs_overall": -0.1168252573771158,
+            "gini": 0.32225252198913323,
+            "graded": true
+          },
+          {
+            "group": "NY",
+            "n": 23386,
+            "mean_pd": 0.12223441584734339,
+            "observed_dr": 0.163815958265629,
+            "share_high_risk_bands": 0.15996750192422818,
+            "ratio": 1.340178681511565,
+            "ratio_vs_overall": 0.11286985775980751,
+            "gini": 0.2835109107690488,
+            "graded": true
+          },
+          {
+            "group": "MI",
+            "n": 7737,
+            "mean_pd": 0.13197020022122288,
+            "observed_dr": 0.14553444487527464,
+            "share_high_risk_bands": 0.21300245573219595,
+            "ratio": 1.1027826329831574,
+            "ratio_vs_overall": -0.08426124901214382,
+            "gini": 0.30756277617932093,
+            "graded": true
+          },
+          {
+            "group": "TX",
+            "n": 23530,
+            "mean_pd": 0.11851661525256904,
+            "observed_dr": 0.14938376540586484,
+            "share_high_risk_bands": 0.13990650233744156,
+            "ratio": 1.2604457618665135,
+            "ratio_vs_overall": 0.04666050510536679,
+            "gini": 0.2774463675714054,
+            "graded": true
+          },
+          {
+            "group": "CA",
+            "n": 41377,
+            "mean_pd": 0.12158442043699666,
+            "observed_dr": 0.1525968533243106,
+            "share_high_risk_bands": 0.16277158808033448,
+            "ratio": 1.2550691344816185,
+            "ratio_vs_overall": 0.04219581197481581,
+            "gini": 0.3150458998681327,
+            "graded": true
+          },
+          {
+            "group": "FL",
+            "n": 20374,
+            "mean_pd": 0.12941159730109522,
+            "observed_dr": 0.16143123588887798,
+            "share_high_risk_bands": 0.19358005300873662,
+            "ratio": 1.2474248000608812,
+            "ratio_vs_overall": 0.03584803948982196,
+            "gini": 0.2712312563058832,
+            "graded": true
+          },
+          {
+            "group": "OTHER",
+            "n": 116869,
+            "mean_pd": 0.12368021149263972,
+            "observed_dr": 0.14438388280895703,
+            "share_high_risk_bands": 0.1724409381444181,
+            "ratio": 1.167396797486471,
+            "ratio_vs_overall": -0.030606346832257936,
+            "gini": 0.30666720191526964,
+            "graded": true
+          },
+          {
+            "group": "PA",
+            "n": 9505,
+            "mean_pd": 0.12802464101410882,
+            "observed_dr": 0.15086796422935297,
+            "share_high_risk_bands": 0.18916359810625985,
+            "ratio": 1.1784291136010818,
+            "ratio_vs_overall": -0.021445231053740632,
+            "gini": 0.2620683207799952,
+            "graded": true
+          },
+          {
+            "group": "OH",
+            "n": 9168,
+            "mean_pd": 0.13103320722424777,
+            "observed_dr": 0.156304537521815,
+            "share_high_risk_bands": 0.2042975567190227,
+            "ratio": 1.192862029655722,
+            "ratio_vs_overall": -0.009460293926796703,
+            "gini": 0.3151205922274434,
+            "graded": true
+          }
+        ],
+        "limitation": "proxy analysis: no protected attributes in the data"
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "fairness",
+      "metric": "oot_group_calibration_dev_income_quartile",
+      "value": 0.17143564614244133,
+      "status": "warn",
+      "warn": 0.1,
+      "fail": 0.2,
+      "rule": "largest group deviation of calibration ratio from the overall ratio (groups with n >= 2000): <= 10% pass, <= 20% warn, else fail",
+      "details": {
+        "overall_ratio": 1.2042546324413235,
+        "worst_group": "Q4",
+        "groups": [
+          {
+            "group": "Q4",
+            "n": 66627,
+            "mean_pd": 0.07806053067812593,
+            "observed_dr": 0.1101205217104177,
+            "share_high_risk_bands": 0.007534483017395351,
+            "ratio": 1.41070680347393,
+            "ratio_vs_overall": 0.17143564614244133,
+            "gini": 0.3332155347064658,
+            "graded": true
+          },
+          {
+            "group": "Q1",
+            "n": 71794,
+            "mean_pd": 0.17205479849609737,
+            "observed_dr": 0.1908794606791654,
+            "share_high_risk_bands": 0.4287127057971418,
+            "ratio": 1.109410852516822,
+            "ratio_vs_overall": -0.07875724732088385,
+            "gini": 0.2221906226393271,
+            "graded": true
+          },
+          {
+            "group": "Q3",
+            "n": 72960,
+            "mean_pd": 0.1078185566964003,
+            "observed_dr": 0.13619791666666667,
+            "share_high_risk_bands": 0.06182839912280702,
+            "ratio": 1.2632140592475012,
+            "ratio_vs_overall": 0.04895926925907057,
+            "gini": 0.3039845375547814,
+            "graded": true
+          },
+          {
+            "group": "Q2",
+            "n": 71645,
+            "mean_pd": 0.13352045877116553,
+            "observed_dr": 0.15568427664177542,
+            "share_high_risk_bands": 0.1730616232814572,
+            "ratio": 1.1659956689378623,
+            "ratio_vs_overall": -0.03176982879933021,
+            "gini": 0.26782621955711905,
+            "graded": true
+          }
+        ],
+        "limitation": "proxy analysis: no protected attributes in the data"
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "fairness",
+      "metric": "oot_group_calibration_dev_home_ownership",
+      "value": 0.013281942794255874,
+      "status": "pass",
+      "warn": 0.1,
+      "fail": 0.2,
+      "rule": "largest group deviation of calibration ratio from the overall ratio (groups with n >= 2000): <= 10% pass, <= 20% warn, else fail",
+      "details": {
+        "overall_ratio": 1.2042546324413235,
+        "worst_group": "MORTGAGE",
+        "groups": [
+          {
+            "group": "OTHER",
+            "n": 1,
+            "mean_pd": 0.04983843297510028,
+            "observed_dr": 0.0,
+            "share_high_risk_bands": 0.0,
+            "ratio": 0.0,
+            "ratio_vs_overall": -1.0,
+            "gini": null,
+            "graded": false
+          },
+          {
+            "group": "MORTGAGE",
+            "n": 129762,
+            "mean_pd": 0.10151697145804854,
+            "observed_dr": 0.12062853531850619,
+            "share_high_risk_bands": 0.07640141181547756,
+            "ratio": 1.1882597913035202,
+            "ratio_vs_overall": -0.013281942794255874,
+            "gini": 0.31116255031734696,
+            "graded": true
+          },
+          {
+            "group": "RENT",
+            "n": 121463,
+            "mean_pd": 0.14476165763221086,
+            "observed_dr": 0.17654759062430533,
+            "share_high_risk_bands": 0.2570494718556268,
+            "ratio": 1.2195742540669954,
+            "ratio_vs_overall": 0.01272124782664541,
+            "gini": 0.2521603822899092,
+            "graded": true
+          },
+          {
+            "group": "OWN",
+            "n": 31800,
+            "mean_pd": 0.1330086803835325,
+            "observed_dr": 0.15833333333333333,
+            "share_high_risk_bands": 0.2218553459119497,
+            "ratio": 1.19039849787831,
+            "ratio_vs_overall": -0.011505984025092508,
+            "gini": 0.25116679414470466,
+            "graded": true
+          }
+        ],
+        "limitation": "proxy analysis: no protected attributes in the data"
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "fairness",
+      "metric": "oot_group_calibration_dev_verification_status",
+      "value": 0.14318193118491618,
+      "status": "warn",
+      "warn": 0.1,
+      "fail": 0.2,
+      "rule": "largest group deviation of calibration ratio from the overall ratio (groups with n >= 2000): <= 10% pass, <= 20% warn, else fail",
+      "details": {
+        "overall_ratio": 1.2042546324413235,
+        "worst_group": "Not Verified",
+        "groups": [
+          {
+            "group": "Not Verified",
+            "n": 83226,
+            "mean_pd": 0.1093917554536724,
+            "observed_dr": 0.11287338091461803,
+            "share_high_risk_bands": 0.1119722202196429,
+            "ratio": 1.0318271285299934,
+            "ratio_vs_overall": -0.14318193118491618,
+            "gini": 0.3157715435439652,
+            "graded": true
+          },
+          {
+            "group": "Verified",
+            "n": 80584,
+            "mean_pd": 0.13835989109361513,
+            "observed_dr": 0.18859823289983124,
+            "share_high_risk_bands": 0.2416856944306562,
+            "ratio": 1.3630990268142416,
+            "ratio_vs_overall": 0.13190266418232577,
+            "gini": 0.27856550308529116,
+            "graded": true
+          },
+          {
+            "group": "Source Verified",
+            "n": 119216,
+            "mean_pd": 0.12357506243016553,
+            "observed_dr": 0.14712790229499395,
+            "share_high_risk_bands": 0.16269628237820427,
+            "ratio": 1.190595411417563,
+            "ratio_vs_overall": -0.011342469155439239,
+            "gini": 0.26201568047909296,
+            "graded": true
+          }
+        ],
+        "limitation": "proxy analysis: no protected attributes in the data"
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "fairness",
+      "metric": "oot_group_calibration_dev_emp_length",
+      "value": 0.22107120187560114,
+      "status": "fail",
+      "warn": 0.1,
+      "fail": 0.2,
+      "rule": "largest group deviation of calibration ratio from the overall ratio (groups with n >= 2000): <= 10% pass, <= 20% warn, else fail",
+      "details": {
+        "overall_ratio": 1.2042546324413235,
+        "worst_group": "unknown",
+        "groups": [
+          {
+            "group": "unknown",
+            "n": 18960,
+            "mean_pd": 0.14673436334490675,
+            "observed_dr": 0.21577004219409282,
+            "share_high_risk_bands": 0.2960970464135021,
+            "ratio": 1.470480651399387,
+            "ratio_vs_overall": 0.22107120187560114,
+            "gini": 0.27609291930920055,
+            "graded": true
+          },
+          {
+            "group": "<1y",
+            "n": 24077,
+            "mean_pd": 0.13120917818624192,
+            "observed_dr": 0.15192922706317233,
+            "share_high_risk_bands": 0.20708560036549403,
+            "ratio": 1.1579161546726542,
+            "ratio_vs_overall": -0.03847896991247579,
+            "gini": 0.27442960893287816,
+            "graded": true
+          },
+          {
+            "group": "1-4y",
+            "n": 84951,
+            "mean_pd": 0.12878271006020944,
+            "observed_dr": 0.15026309284175585,
+            "share_high_risk_bands": 0.19289943614554272,
+            "ratio": 1.1667955486532604,
+            "ratio_vs_overall": -0.031105617349483805,
+            "gini": 0.28000061294413214,
+            "graded": true
+          },
+          {
+            "group": "10y+",
+            "n": 89647,
+            "mean_pd": 0.11242758074400722,
+            "observed_dr": 0.1333786964427142,
+            "share_high_risk_bands": 0.11751648131002711,
+            "ratio": 1.1863520993697425,
+            "ratio_vs_overall": -0.014866069508313262,
+            "gini": 0.3114759830440166,
+            "graded": true
+          },
+          {
+            "group": "5-9y",
+            "n": 65391,
+            "mean_pd": 0.12273453686986567,
+            "observed_dr": 0.14774204401217292,
+            "share_high_risk_bands": 0.16315700937437874,
+            "ratio": 1.2037528130229755,
+            "ratio_vs_overall": -0.00041670540833260716,
+            "gini": 0.29092053003047713,
+            "graded": true
+          }
+        ],
+        "limitation": "proxy analysis: no protected attributes in the data"
+      }
+    },
+    {
+      "model": "scorecard_independent",
+      "test": "fairness",
+      "metric": "geographic_importance_share",
+      "value": 0.0,
+      "status": "pass",
+      "warn": 0.02,
+      "fail": 0.05,
+      "rule": "share of model importance on geographic variables ['addr_state', 'zip3']: <= 2% pass, <= 5% warn, else fail (potential proxy; needs legal review)",
+      "details": {
+        "importance_share": {
+          "fico_mid": 0.23322285531768086,
+          "inq_last_6mths": 0.15979086636263223,
+          "loan_to_income": 0.1222059954231962,
+          "annual_inc": 0.11335537109214161,
+          "dti": 0.10957384158251149,
+          "avg_cur_bal": 0.08423404627975685,
+          "total_rev_hi_lim": 0.06045965030900354,
+          "bc_util": 0.051934340483098494,
+          "home_ownership": 0.03200170824834229,
+          "credit_history_years": 0.017662158351357697
+        }
       }
     },
     {
@@ -1587,24 +2373,26 @@
     {
       "model": "xgboost_independent",
       "test": "stability",
-      "metric": "csi_max_train_to_valid",
+      "metric": "csi_max_used_feature_train_to_valid",
       "value": 1.1917673496433514,
       "status": "fail",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail (features used by the model only)",
       "details": {
         "worst_feature": "total_rev_hi_lim",
-        "n_features_above_warn": 8,
-        "n_features_above_fail": 6,
-        "top10": [
+        "n_used_features": 29,
+        "n_used_above_warn": 8,
+        "n_used_above_fail": 6,
+        "top10_all_features": [
           {
             "feature": "total_rev_hi_lim",
             "kind": "numeric",
             "psi": 1.1917673496433514,
             "missing_expected": 0.15671475829094042,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "avg_cur_bal",
@@ -1612,7 +2400,8 @@
             "psi": 1.1830697183518204,
             "missing_expected": 0.15674255691768826,
             "missing_actual": 3.075598203850649e-05,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "tot_cur_bal",
@@ -1620,7 +2409,8 @@
             "psi": 1.182547519131231,
             "missing_expected": 0.15671475829094042,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "num_bc_sats",
@@ -1628,7 +2418,8 @@
             "psi": 0.6301433837975143,
             "missing_expected": 0.0901787451699886,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "initial_list_status",
@@ -1636,7 +2427,8 @@
             "psi": 0.3168743019939458,
             "missing_expected": 0.0,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "mort_acc",
@@ -1644,7 +2436,8 @@
             "psi": 0.2570980776775418,
             "missing_expected": 0.041871681538931976,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "mths_since_last_record",
@@ -1652,7 +2445,8 @@
             "psi": 0.14963169305524895,
             "missing_expected": 0.9037889528257305,
             "missing_actual": 0.8106784769637695,
-            "label": "moderate shift"
+            "label": "moderate shift",
+            "used_by_model": true
           },
           {
             "feature": "verification_status",
@@ -1660,7 +2454,8 @@
             "psi": 0.13650432610957183,
             "missing_expected": 0.0,
             "missing_actual": 0.0,
-            "label": "moderate shift"
+            "label": "moderate shift",
+            "used_by_model": true
           },
           {
             "feature": "bc_util",
@@ -1668,7 +2463,8 @@
             "psi": 0.07360002395184609,
             "missing_expected": 0.05081588969504906,
             "missing_actual": 0.011613458817740051,
-            "label": "stable"
+            "label": "stable",
+            "used_by_model": true
           },
           {
             "feature": "pub_rec",
@@ -1676,14 +2472,15 @@
             "psi": 0.07315009582605858,
             "missing_expected": 0.0,
             "missing_actual": 0.0,
-            "label": "stable"
+            "label": "stable",
+            "used_by_model": true
           }
         ]
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_total_rev_hi_lim_train_to_valid",
       "value": 1.1917673496433514,
       "status": "fail",
@@ -1691,13 +2488,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.15671475829094042,
         "missing_actual": 0.0
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_avg_cur_bal_train_to_valid",
       "value": 1.1830697183518204,
       "status": "fail",
@@ -1705,13 +2503,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.15674255691768826,
         "missing_actual": 3.075598203850649e-05
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_tot_cur_bal_train_to_valid",
       "value": 1.182547519131231,
       "status": "fail",
@@ -1719,13 +2518,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.15671475829094042,
         "missing_actual": 0.0
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_num_bc_sats_train_to_valid",
       "value": 0.6301433837975143,
       "status": "fail",
@@ -1733,13 +2533,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.0901787451699886,
         "missing_actual": 0.0
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_initial_list_status_train_to_valid",
       "value": 0.3168743019939458,
       "status": "fail",
@@ -1747,13 +2548,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.0,
         "missing_actual": 0.0
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_mort_acc_train_to_valid",
       "value": 0.2570980776775418,
       "status": "fail",
@@ -1761,13 +2563,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.041871681538931976,
         "missing_actual": 0.0
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_mths_since_last_record_train_to_valid",
       "value": 0.14963169305524895,
       "status": "warn",
@@ -1775,13 +2578,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.9037889528257305,
         "missing_actual": 0.8106784769637695
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_verification_status_train_to_valid",
       "value": 0.13650432610957183,
       "status": "warn",
@@ -1789,6 +2593,7 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.0,
         "missing_actual": 0.0
       }
@@ -1796,24 +2601,26 @@
     {
       "model": "xgboost_independent",
       "test": "stability",
-      "metric": "csi_max_train_to_oot",
+      "metric": "csi_max_used_feature_train_to_oot",
       "value": 1.1967119352332505,
       "status": "fail",
       "warn": 0.1,
       "fail": 0.25,
-      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
+      "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail (features used by the model only)",
       "details": {
         "worst_feature": "total_rev_hi_lim",
-        "n_features_above_warn": 9,
-        "n_features_above_fail": 6,
-        "top10": [
+        "n_used_features": 29,
+        "n_used_above_warn": 9,
+        "n_used_above_fail": 6,
+        "top10_all_features": [
           {
             "feature": "total_rev_hi_lim",
             "kind": "numeric",
             "psi": 1.1967119352332505,
             "missing_expected": 0.15671475829094042,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "tot_cur_bal",
@@ -1821,7 +2628,8 @@
             "psi": 1.1899701757301044,
             "missing_expected": 0.15671475829094042,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "avg_cur_bal",
@@ -1829,7 +2637,8 @@
             "psi": 1.1884054410319127,
             "missing_expected": 0.15674255691768826,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "num_bc_sats",
@@ -1837,7 +2646,8 @@
             "psi": 0.6434890660410659,
             "missing_expected": 0.0901787451699886,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "initial_list_status",
@@ -1845,7 +2655,8 @@
             "psi": 0.6166245231825083,
             "missing_expected": 0.0,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "mort_acc",
@@ -1853,7 +2664,8 @@
             "psi": 0.2632352168182509,
             "missing_expected": 0.041871681538931976,
             "missing_actual": 0.0,
-            "label": "significant shift"
+            "label": "significant shift",
+            "used_by_model": true
           },
           {
             "feature": "verification_status",
@@ -1861,7 +2673,8 @@
             "psi": 0.20328872499489592,
             "missing_expected": 0.0,
             "missing_actual": 0.0,
-            "label": "moderate shift"
+            "label": "moderate shift",
+            "used_by_model": true
           },
           {
             "feature": "mths_since_last_record",
@@ -1869,7 +2682,8 @@
             "psi": 0.19293769322106785,
             "missing_expected": 0.9037889528257305,
             "missing_actual": 0.8133387038646626,
-            "label": "moderate shift"
+            "label": "moderate shift",
+            "used_by_model": true
           },
           {
             "feature": "bc_util",
@@ -1877,7 +2691,8 @@
             "psi": 0.10559915926400779,
             "missing_expected": 0.05081588969504906,
             "missing_actual": 0.010698663727007413,
-            "label": "moderate shift"
+            "label": "moderate shift",
+            "used_by_model": true
           },
           {
             "feature": "pub_rec",
@@ -1885,14 +2700,15 @@
             "psi": 0.06948386122049369,
             "missing_expected": 0.0,
             "missing_actual": 0.0,
-            "label": "stable"
+            "label": "stable",
+            "used_by_model": true
           }
         ]
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_total_rev_hi_lim_train_to_oot",
       "value": 1.1967119352332505,
       "status": "fail",
@@ -1900,13 +2716,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.15671475829094042,
         "missing_actual": 0.0
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_tot_cur_bal_train_to_oot",
       "value": 1.1899701757301044,
       "status": "fail",
@@ -1914,13 +2731,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.15671475829094042,
         "missing_actual": 0.0
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_avg_cur_bal_train_to_oot",
       "value": 1.1884054410319127,
       "status": "fail",
@@ -1928,13 +2746,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.15674255691768826,
         "missing_actual": 0.0
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_num_bc_sats_train_to_oot",
       "value": 0.6434890660410659,
       "status": "fail",
@@ -1942,13 +2761,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.0901787451699886,
         "missing_actual": 0.0
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_initial_list_status_train_to_oot",
       "value": 0.6166245231825083,
       "status": "fail",
@@ -1956,13 +2776,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.0,
         "missing_actual": 0.0
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_mort_acc_train_to_oot",
       "value": 0.2632352168182509,
       "status": "fail",
@@ -1970,13 +2791,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.041871681538931976,
         "missing_actual": 0.0
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_verification_status_train_to_oot",
       "value": 0.20328872499489592,
       "status": "warn",
@@ -1984,13 +2806,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.0,
         "missing_actual": 0.0
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_mths_since_last_record_train_to_oot",
       "value": 0.19293769322106785,
       "status": "warn",
@@ -1998,13 +2821,14 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.9037889528257305,
         "missing_actual": 0.8133387038646626
       }
     },
     {
       "model": "xgboost_independent",
-      "test": "stability",
+      "test": "stability_detail",
       "metric": "csi_bc_util_train_to_oot",
       "value": 0.10559915926400779,
       "status": "warn",
@@ -2012,6 +2836,7 @@
       "fail": 0.25,
       "rule": "PSI <= 0.1 pass, <= 0.25 warn, else fail",
       "details": {
+        "used_by_model": true,
         "missing_expected": 0.05081588969504906,
         "missing_actual": 0.010698663727007413
       }
@@ -2042,6 +2867,768 @@
       "details": {
         "train_dr": 0.12704667389430963,
         "oot_dr": 0.14886264866125373
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "sensitivity",
+      "metric": "vintage_sensitive_features",
+      "value": 6.0,
+      "status": "info",
+      "warn": null,
+      "fail": null,
+      "rule": "",
+      "details": {
+        "features": [
+          "tot_cur_bal",
+          "total_rev_hi_lim",
+          "avg_cur_bal",
+          "num_bc_sats",
+          "bc_util",
+          "mort_acc"
+        ],
+        "missing_share_by_year": [
+          {
+            "spread": 0.5187485622268231,
+            "2012": 0.5187485622268231,
+            "2013": 0.0
+          },
+          {
+            "spread": 0.5187485622268231,
+            "2012": 0.5187485622268231,
+            "2013": 0.0
+          },
+          {
+            "spread": 0.5187087303174805,
+            "2012": 0.5187485622268231,
+            "2013": 3.9831909342574336e-05
+          },
+          {
+            "spread": 0.29850471589602023,
+            "2012": 0.29850471589602023,
+            "2013": 0.0
+          },
+          {
+            "spread": 0.14055254940094827,
+            "2012": 0.14890729238555325,
+            "2013": 0.008354742984604967
+          },
+          {
+            "spread": 0.13860133425350818,
+            "2012": 0.13860133425350818,
+            "2013": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "sensitivity",
+      "metric": "oot_gini_without_vintage_features",
+      "value": 0.33139279026932944,
+      "status": "info",
+      "warn": null,
+      "fail": null,
+      "rule": "",
+      "details": {
+        "removed": [
+          "tot_cur_bal",
+          "total_rev_hi_lim",
+          "avg_cur_bal",
+          "num_bc_sats",
+          "bc_util",
+          "mort_acc"
+        ],
+        "gini_original": 0.3344953549050389,
+        "ks_original": 0.24193733961424724,
+        "ks_reduced": 0.2403852470964058,
+        "calibration_ratio_original": 1.1872491201628657,
+        "calibration_ratio_reduced": 1.1678922607099262,
+        "removed_features_used_by_original": [
+          "avg_cur_bal",
+          "bc_util",
+          "mort_acc",
+          "num_bc_sats",
+          "tot_cur_bal",
+          "total_rev_hi_lim"
+        ]
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "sensitivity",
+      "metric": "vintage_gini_loss",
+      "value": 0.009275359403990102,
+      "status": "pass",
+      "warn": 0.03,
+      "fail": 0.1,
+      "rule": "relative OOT Gini loss when vintage-sensitive features are removed: <= 3% pass, <= 10% warn, else fail",
+      "details": {
+        "gini_original": 0.3344953549050389,
+        "gini_reduced": 0.33139279026932944
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "leakage",
+      "metric": "post_origination_features_in_model",
+      "value": 0.0,
+      "status": "pass",
+      "warn": 0,
+      "fail": 0,
+      "rule": "no model input may be a post-origination column",
+      "details": {
+        "forbidden_columns_checked": [
+          "out_prncp",
+          "total_pymnt",
+          "total_rec_prncp",
+          "total_rec_int",
+          "total_rec_late_fee",
+          "recoveries",
+          "collection_recovery_fee",
+          "last_pymnt_d",
+          "last_pymnt_amnt",
+          "last_credit_pull_d",
+          "last_fico_range_high",
+          "last_fico_range_low",
+          "debt_settlement_flag"
+        ],
+        "found": []
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "leakage",
+      "metric": "max_single_feature_gini",
+      "value": 0.20297349123541664,
+      "status": "pass",
+      "warn": 0.4,
+      "fail": 0.5,
+      "rule": "strongest single input Gini <= 0.4 pass, <= 0.5 warn, else fail (a single input this predictive usually means leakage)",
+      "details": {
+        "strongest": "fico_mid",
+        "top5": [
+          {
+            "feature": "fico_mid",
+            "gini": 0.20297349123541664
+          },
+          {
+            "feature": "avg_cur_bal",
+            "gini": 0.14327980599476675
+          },
+          {
+            "feature": "annual_inc",
+            "gini": 0.13876174118902895
+          },
+          {
+            "feature": "dti",
+            "gini": 0.1376507467475041
+          },
+          {
+            "feature": "total_rev_hi_lim",
+            "gini": 0.1355606953310602
+          }
+        ]
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "leakage",
+      "metric": "demonstration_leaky_model_oot_gini",
+      "value": 0.9982398745706453,
+      "status": "info",
+      "warn": null,
+      "fail": null,
+      "rule": "",
+      "details": {
+        "clean_model_gini": 0.3344953549050389,
+        "inflation": 0.6637445196656064,
+        "leaky_ks": 0.9780984345370837,
+        "single_feature_gini_of_post_origination_columns": [
+          {
+            "feature": "last_fico_range_low",
+            "gini": 0.8746885933342397
+          },
+          {
+            "feature": "last_fico_range_high",
+            "gini": 0.8746723325820818
+          },
+          {
+            "feature": "recoveries",
+            "gini": 0.7195718218930978
+          },
+          {
+            "feature": "collection_recovery_fee",
+            "gini": 0.7192395328966108
+          },
+          {
+            "feature": "total_rec_prncp",
+            "gini": 0.6511887119416848
+          },
+          {
+            "feature": "last_pymnt_amnt",
+            "gini": 0.5205838182908858
+          },
+          {
+            "feature": "total_pymnt",
+            "gini": 0.5047583920148089
+          },
+          {
+            "feature": "total_rec_late_fee",
+            "gini": 0.11196977983647804
+          },
+          {
+            "feature": "out_prncp",
+            "gini": 0.0
+          }
+        ],
+        "note": "retrained with post-origination columns to show the effect; the production model excludes them"
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "explanation_stability",
+      "metric": "importance_rank_corr_train_to_valid",
+      "value": 0.9784615384615385,
+      "status": "pass",
+      "warn": 0.8,
+      "fail": 0.6,
+      "rule": "Spearman rank correlation >= 0.8 pass, >= 0.6 warn, else fail",
+      "details": {
+        "top5_overlap": 1.0
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "explanation_stability",
+      "metric": "importance_rank_corr_train_to_oot",
+      "value": 0.9792307692307692,
+      "status": "pass",
+      "warn": 0.8,
+      "fail": 0.6,
+      "rule": "Spearman rank correlation >= 0.8 pass, >= 0.6 warn, else fail",
+      "details": {
+        "top5_overlap": 1.0
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "explanation_stability",
+      "metric": "largest_importance_share_change_train_to_oot",
+      "value": 0.011817232705652714,
+      "status": "info",
+      "warn": null,
+      "fail": null,
+      "rule": "",
+      "details": {
+        "feature": "mths_since_last_record",
+        "importance_shares": [
+          {
+            "train": 0.1538766622543335,
+            "valid": 0.14768151938915253,
+            "oot": 0.14850272238254547,
+            "change_train_to_oot": -0.005373939871788025
+          },
+          {
+            "train": 0.08331786841154099,
+            "valid": 0.08027007430791855,
+            "oot": 0.07966959476470947,
+            "change_train_to_oot": -0.0036482736468315125
+          },
+          {
+            "train": 0.08268632739782333,
+            "valid": 0.07766130566596985,
+            "oot": 0.07269969582557678,
+            "change_train_to_oot": -0.009986631572246552
+          },
+          {
+            "train": 0.06227094680070877,
+            "valid": 0.061916280537843704,
+            "oot": 0.060719843953847885,
+            "change_train_to_oot": -0.0015511028468608856
+          },
+          {
+            "train": 0.056396570056676865,
+            "valid": 0.05651567131280899,
+            "oot": 0.05774857476353645,
+            "change_train_to_oot": 0.0013520047068595886
+          },
+          {
+            "train": 0.04592035338282585,
+            "valid": 0.04629015177488327,
+            "oot": 0.04679581895470619,
+            "change_train_to_oot": 0.0008754655718803406
+          },
+          {
+            "train": 0.04876691475510597,
+            "valid": 0.04753505811095238,
+            "oot": 0.045994870364665985,
+            "change_train_to_oot": -0.002772044390439987
+          },
+          {
+            "train": 0.04768238961696625,
+            "valid": 0.04441652446985245,
+            "oot": 0.04421824589371681,
+            "change_train_to_oot": -0.0034641437232494354
+          },
+          {
+            "train": 0.03654874861240387,
+            "valid": 0.03942674770951271,
+            "oot": 0.04129333794116974,
+            "change_train_to_oot": 0.004744589328765869
+          },
+          {
+            "train": 0.035628024488687515,
+            "valid": 0.03880562633275986,
+            "oot": 0.040433332324028015,
+            "change_train_to_oot": 0.0048053078353405
+          },
+          {
+            "train": 0.04314576834440231,
+            "valid": 0.03967159241437912,
+            "oot": 0.037821851670742035,
+            "change_train_to_oot": -0.005323916673660278
+          },
+          {
+            "train": 0.03931872546672821,
+            "valid": 0.03569520637392998,
+            "oot": 0.03644797205924988,
+            "change_train_to_oot": -0.0028707534074783325
+          }
+        ]
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "explanation_stability",
+      "metric": "importance_rank_corr_champion_vs_challenger_oot",
+      "value": 0.5420129305237467,
+      "status": "fail",
+      "warn": 0.8,
+      "fail": 0.6,
+      "rule": "Spearman rank correlation >= 0.8 pass, >= 0.6 warn, else fail (do the two models rely on the same drivers?)",
+      "details": {
+        "top5_overlap": 1.0,
+        "champion_top5": [
+          "fico_mid",
+          "inq_last_6mths",
+          "loan_to_income",
+          "annual_inc",
+          "dti"
+        ],
+        "challenger_top5": [
+          "fico_mid",
+          "annual_inc",
+          "inq_last_6mths",
+          "loan_to_income",
+          "dti"
+        ]
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "fairness",
+      "metric": "oot_group_calibration_dev_addr_state",
+      "value": 0.1591901574328085,
+      "status": "warn",
+      "warn": 0.1,
+      "fail": 0.2,
+      "rule": "largest group deviation of calibration ratio from the overall ratio (groups with n >= 2000): <= 10% pass, <= 20% warn, else fail",
+      "details": {
+        "overall_ratio": 1.1872491201628657,
+        "worst_group": "TX",
+        "groups": [
+          {
+            "group": "TX",
+            "n": 23530,
+            "mean_pd": 0.10854425966360476,
+            "observed_dr": 0.14938376540586484,
+            "share_high_risk_bands": 0.12095197620059499,
+            "ratio": 1.3762474945135557,
+            "ratio_vs_overall": 0.1591901574328085,
+            "gini": 0.31162056622540213,
+            "graded": true
+          },
+          {
+            "group": "MI",
+            "n": 7737,
+            "mean_pd": 0.13979396217738463,
+            "observed_dr": 0.14553444487527464,
+            "share_high_risk_bands": 0.2541036577484813,
+            "ratio": 1.0410638815044524,
+            "ratio_vs_overall": -0.12312937207176844,
+            "gini": 0.33823491876529577,
+            "graded": true
+          },
+          {
+            "group": "FL",
+            "n": 20374,
+            "mean_pd": 0.14784287933284979,
+            "observed_dr": 0.16143123588887798,
+            "share_high_risk_bands": 0.2929223520172769,
+            "ratio": 1.0919107948745757,
+            "ratio_vs_overall": -0.08030187065980865,
+            "gini": 0.31354877642620504,
+            "graded": true
+          },
+          {
+            "group": "PA",
+            "n": 9505,
+            "mean_pd": 0.11920088735883806,
+            "observed_dr": 0.15086796422935297,
+            "share_high_risk_bands": 0.16128353498158865,
+            "ratio": 1.2656614189052593,
+            "ratio_vs_overall": 0.06604536268819228,
+            "gini": 0.28406694629790996,
+            "graded": true
+          },
+          {
+            "group": "CA",
+            "n": 41377,
+            "mean_pd": 0.12342938465015678,
+            "observed_dr": 0.1525968533243106,
+            "share_high_risk_bands": 0.19286076805955,
+            "ratio": 1.2363089531461646,
+            "ratio_vs_overall": 0.041322273607218074,
+            "gini": 0.35292011281815006,
+            "graded": true
+          },
+          {
+            "group": "IL",
+            "n": 11609,
+            "mean_pd": 0.11461832356211692,
+            "observed_dr": 0.1309328968903437,
+            "share_high_risk_bands": 0.14678266861917477,
+            "ratio": 1.1423382651324958,
+            "ratio_vs_overall": -0.03782765913880737,
+            "gini": 0.32563520196566365,
+            "graded": true
+          },
+          {
+            "group": "NY",
+            "n": 23386,
+            "mean_pd": 0.13461770452307706,
+            "observed_dr": 0.163815958265629,
+            "share_high_risk_bands": 0.23291712990678184,
+            "ratio": 1.2168975755900413,
+            "ratio_vs_overall": 0.02497239620873204,
+            "gini": 0.3111209533498571,
+            "graded": true
+          },
+          {
+            "group": "OTHER",
+            "n": 116869,
+            "mean_pd": 0.12432940385841475,
+            "observed_dr": 0.14438388280895703,
+            "share_high_risk_bands": 0.19374684475780574,
+            "ratio": 1.1613011751699553,
+            "ratio_vs_overall": -0.021855518401522,
+            "gini": 0.34414298171350444,
+            "graded": true
+          },
+          {
+            "group": "OH",
+            "n": 9168,
+            "mean_pd": 0.13408972779093847,
+            "observed_dr": 0.156304537521815,
+            "share_high_risk_bands": 0.23178446771378708,
+            "ratio": 1.1656712269974328,
+            "ratio_vs_overall": -0.018174697120409644,
+            "gini": 0.3506658769579014,
+            "graded": true
+          },
+          {
+            "group": "GA",
+            "n": 9383,
+            "mean_pd": 0.10868066291336308,
+            "observed_dr": 0.12853032079292337,
+            "share_high_risk_bands": 0.12085686880528615,
+            "ratio": 1.1826420390477728,
+            "ratio_vs_overall": -0.0038804670703490585,
+            "gini": 0.3689909264975113,
+            "graded": true
+          },
+          {
+            "group": "NJ",
+            "n": 10088,
+            "mean_pd": 0.1329344411680259,
+            "observed_dr": 0.15761300555114988,
+            "share_high_risk_bands": 0.22918318794607453,
+            "ratio": 1.185644624269574,
+            "ratio_vs_overall": -0.0013514399514329423,
+            "gini": 0.30767076530030746,
+            "graded": true
+          }
+        ],
+        "limitation": "proxy analysis: no protected attributes in the data"
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "fairness",
+      "metric": "oot_group_calibration_dev_income_quartile",
+      "value": 0.11897604193587652,
+      "status": "warn",
+      "warn": 0.1,
+      "fail": 0.2,
+      "rule": "largest group deviation of calibration ratio from the overall ratio (groups with n >= 2000): <= 10% pass, <= 20% warn, else fail",
+      "details": {
+        "overall_ratio": 1.1872491201628657,
+        "worst_group": "Q4",
+        "groups": [
+          {
+            "group": "Q4",
+            "n": 66627,
+            "mean_pd": 0.08289066346104881,
+            "observed_dr": 0.1101205217104177,
+            "share_high_risk_bands": 0.05397211340747745,
+            "ratio": 1.3285033212716952,
+            "ratio_vs_overall": 0.11897604193587652,
+            "gini": 0.3657728580626045,
+            "graded": true
+          },
+          {
+            "group": "Q1",
+            "n": 71794,
+            "mean_pd": 0.17628767725319874,
+            "observed_dr": 0.1908794606791654,
+            "share_high_risk_bands": 0.41428253057358555,
+            "ratio": 1.0827725661448744,
+            "ratio_vs_overall": -0.08799884728797214,
+            "gini": 0.256110839944097,
+            "graded": true
+          },
+          {
+            "group": "Q3",
+            "n": 72960,
+            "mean_pd": 0.10580906418685468,
+            "observed_dr": 0.13619791666666667,
+            "share_high_risk_bands": 0.1035498903508772,
+            "ratio": 1.2872046238510007,
+            "ratio_vs_overall": 0.0841908425035709,
+            "gini": 0.33978933760005825,
+            "graded": true
+          },
+          {
+            "group": "Q2",
+            "n": 71645,
+            "mean_pd": 0.1338278588363497,
+            "observed_dr": 0.15568427664177542,
+            "share_high_risk_bands": 0.20607160304278038,
+            "ratio": 1.1633173988993775,
+            "ratio_vs_overall": -0.02015728700662689,
+            "gini": 0.30734095277517515,
+            "graded": true
+          }
+        ],
+        "limitation": "proxy analysis: no protected attributes in the data"
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "fairness",
+      "metric": "oot_group_calibration_dev_home_ownership",
+      "value": 0.030304284523364977,
+      "status": "pass",
+      "warn": 0.1,
+      "fail": 0.2,
+      "rule": "largest group deviation of calibration ratio from the overall ratio (groups with n >= 2000): <= 10% pass, <= 20% warn, else fail",
+      "details": {
+        "overall_ratio": 1.1872491201628657,
+        "worst_group": "MORTGAGE",
+        "groups": [
+          {
+            "group": "OTHER",
+            "n": 1,
+            "mean_pd": 0.04763050749897957,
+            "observed_dr": 0.0,
+            "share_high_risk_bands": 0.0,
+            "ratio": 0.0,
+            "ratio_vs_overall": -1.0,
+            "gini": null,
+            "graded": false
+          },
+          {
+            "group": "MORTGAGE",
+            "n": 129762,
+            "mean_pd": 0.10477863140364857,
+            "observed_dr": 0.12062853531850619,
+            "share_high_risk_bands": 0.11936468303509502,
+            "ratio": 1.1512703850253354,
+            "ratio_vs_overall": -0.030304284523364977,
+            "gini": 0.3467407267633429,
+            "graded": true
+          },
+          {
+            "group": "RENT",
+            "n": 121463,
+            "mean_pd": 0.14569547234498836,
+            "observed_dr": 0.17654759062430533,
+            "share_high_risk_bands": 0.2708396795732034,
+            "ratio": 1.2117575637921203,
+            "ratio_vs_overall": 0.02064305057214333,
+            "gini": 0.2937104769530463,
+            "graded": true
+          },
+          {
+            "group": "OWN",
+            "n": 31800,
+            "mean_pd": 0.1318911461758357,
+            "observed_dr": 0.15833333333333333,
+            "share_high_risk_bands": 0.22867924528301886,
+            "ratio": 1.2004849296119182,
+            "ratio_vs_overall": 0.011148300069691253,
+            "gini": 0.29889447508390266,
+            "graded": true
+          }
+        ],
+        "limitation": "proxy analysis: no protected attributes in the data"
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "fairness",
+      "metric": "oot_group_calibration_dev_verification_status",
+      "value": 0.07597141157667253,
+      "status": "pass",
+      "warn": 0.1,
+      "fail": 0.2,
+      "rule": "largest group deviation of calibration ratio from the overall ratio (groups with n >= 2000): <= 10% pass, <= 20% warn, else fail",
+      "details": {
+        "overall_ratio": 1.1872491201628657,
+        "worst_group": "Not Verified",
+        "groups": [
+          {
+            "group": "Not Verified",
+            "n": 83226,
+            "mean_pd": 0.1028878919888123,
+            "observed_dr": 0.11287338091461803,
+            "share_high_risk_bands": 0.11203229759930791,
+            "ratio": 1.0970521286109303,
+            "ratio_vs_overall": -0.07597141157667253,
+            "gini": 0.3420102521503976,
+            "graded": true
+          },
+          {
+            "group": "Verified",
+            "n": 80584,
+            "mean_pd": 0.1498615795833939,
+            "observed_dr": 0.18859823289983124,
+            "share_high_risk_bands": 0.2993398193189715,
+            "ratio": 1.2584828841663278,
+            "ratio_vs_overall": 0.059999003405191376,
+            "gini": 0.29993452650203123,
+            "graded": true
+          },
+          {
+            "group": "Source Verified",
+            "n": 119216,
+            "mean_pd": 0.12454441330634758,
+            "observed_dr": 0.14712790229499395,
+            "share_high_risk_bands": 0.18631727284928198,
+            "ratio": 1.1813287998161486,
+            "ratio_vs_overall": -0.004986586425858919,
+            "gini": 0.3096073295041468,
+            "graded": true
+          }
+        ],
+        "limitation": "proxy analysis: no protected attributes in the data"
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "fairness",
+      "metric": "oot_group_calibration_dev_emp_length",
+      "value": 0.02334910958945824,
+      "status": "pass",
+      "warn": 0.1,
+      "fail": 0.2,
+      "rule": "largest group deviation of calibration ratio from the overall ratio (groups with n >= 2000): <= 10% pass, <= 20% warn, else fail",
+      "details": {
+        "overall_ratio": 1.1872491201628657,
+        "worst_group": "unknown",
+        "groups": [
+          {
+            "group": "unknown",
+            "n": 18960,
+            "mean_pd": 0.17759284887041402,
+            "observed_dr": 0.21577004219409282,
+            "share_high_risk_bands": 0.4288502109704641,
+            "ratio": 1.2149703299795362,
+            "ratio_vs_overall": 0.02334910958945824,
+            "gini": 0.2882469583338587,
+            "graded": true
+          },
+          {
+            "group": "10y+",
+            "n": 89647,
+            "mean_pd": 0.1137552944787446,
+            "observed_dr": 0.1333786964427142,
+            "share_high_risk_bands": 0.14943054424576394,
+            "ratio": 1.1725053946182369,
+            "ratio_vs_overall": -0.012418392479083273,
+            "gini": 0.34652233316464276,
+            "graded": true
+          },
+          {
+            "group": "<1y",
+            "n": 24077,
+            "mean_pd": 0.12887678215873813,
+            "observed_dr": 0.15192922706317233,
+            "share_high_risk_bands": 0.20853926984258836,
+            "ratio": 1.1788719777006877,
+            "ratio_vs_overall": -0.00705592644366726,
+            "gini": 0.30460377507832015,
+            "graded": true
+          },
+          {
+            "group": "1-4y",
+            "n": 84951,
+            "mean_pd": 0.1258798479994232,
+            "observed_dr": 0.15026309284175585,
+            "share_high_risk_bands": 0.19687820037433343,
+            "ratio": 1.1937025284813212,
+            "ratio_vs_overall": 0.005435597473906872,
+            "gini": 0.32073674104876093,
+            "graded": true
+          },
+          {
+            "group": "5-9y",
+            "n": 65391,
+            "mean_pd": 0.12426042504908376,
+            "observed_dr": 0.14774204401217292,
+            "share_high_risk_bands": 0.18939915278861005,
+            "ratio": 1.188971017552964,
+            "ratio_vs_overall": 0.0014503252610220674,
+            "gini": 0.3262116876411443,
+            "graded": true
+          }
+        ],
+        "limitation": "proxy analysis: no protected attributes in the data"
+      }
+    },
+    {
+      "model": "xgboost_independent",
+      "test": "fairness",
+      "metric": "geographic_importance_share",
+      "value": 0.045994870364665985,
+      "status": "warn",
+      "warn": 0.02,
+      "fail": 0.05,
+      "rule": "share of model importance on geographic variables ['addr_state', 'zip3']: <= 2% pass, <= 5% warn, else fail (potential proxy; needs legal review)",
+      "details": {
+        "importance_share": {
+          "fico_mid": 0.14850272238254547,
+          "annual_inc": 0.07966959476470947,
+          "inq_last_6mths": 0.07269969582557678,
+          "loan_to_income": 0.060719843953847885,
+          "dti": 0.05774857476353645,
+          "revol_bal": 0.04679581895470619,
+          "addr_state": 0.045994870364665985,
+          "purpose": 0.04421824589371681,
+          "total_rev_hi_lim": 0.04129333794116974,
+          "loan_amnt": 0.040433332324028015
+        }
       }
     }
   ]

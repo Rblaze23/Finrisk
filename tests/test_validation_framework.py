@@ -44,10 +44,17 @@ def test_make_turns_nan_value_into_none():
 
 def test_thresholds_are_ordered_sensibly():
     for key, (warn, fail) in R.THRESHOLDS.items():
-        if key == "gini_floor":
-            assert fail < warn                        # lower is worse
+        if key in R.LOWER_IS_WORSE:
+            assert fail < warn, key                   # lower is worse
         else:
-            assert warn < fail
+            assert warn < fail, key
+
+
+def test_detail_tests_are_flagged_as_diagnostics():
+    assert R.make("m", "stability_detail", "x", 1.0, "warn").__class__ is R.TestResult
+    r = R.TestResult("m", "stability_detail", "x", 1.0, "warn")
+    assert r.is_detail
+    assert not R.TestResult("m", "stability", "x", 1.0, "warn").is_detail
 
 
 def test_performance_by_period_returns_quarterly_gini():

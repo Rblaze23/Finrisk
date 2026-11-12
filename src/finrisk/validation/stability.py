@@ -5,6 +5,13 @@ PSI = sum( (actual% - expected%) * ln(actual% / expected%) )  over bins.
 
   Score PSI : shift of the model's PD distribution vs the training population
   CSI       : the same measure per input feature (missing values form their own bin)
+
+Only features the model actually USES are graded; drifting features it does not use,
+and every per-feature row, are diagnostics ("stability_detail") that do not inflate the
+headline totals.
+Note: when a bin disappears entirely (e.g. a field that was 16% missing in training and
+never missing afterwards) the formula gives a very large PSI. The flag is real (a structural
+break in data availability) but the exact magnitude is dominated by that empty bin.
 """
 from __future__ import annotations
 
@@ -80,6 +87,12 @@ def csi_table(expected_df: pd.DataFrame, actual_df: pd.DataFrame,
     return t
 
 
+def model_features(ctx) -> list[str]:
+    """Features the model actually uses (scorecard: after selection; boosting: all)."""
+    used = getattr(ctx.model, "features_", None)
+    return list(used) if used else list(ctx.numeric) + list(ctx.categorical)
+
+
 # ---------------------------------------------------------------------------
 def run(ctx) -> list:
     out, m = [], ctx.model_name
@@ -90,22 +103,28 @@ def run(ctx) -> list:
         v = psi_numeric(ctx.pds["train"], ctx.pds[s])
         out.append(make(m, "stability", f"score_psi_train_to_{s}", v, grade(v, w, f), w, f, rule))
 
+    used = set(model_features(ctx))
     train = ctx.splits["train"]
     for s in ["valid", "oot"]:
         tab = csi_table(train, ctx.splits[s], ctx.numeric, ctx.categorical)
-        worst = tab.iloc[0]
+        tab["used_by_model"] = tab["feature"].isin(used)
+        tab_used = tab[tab["used_by_model"]]
+        worst = tab_used.iloc[0]
         out.append(make(
-            m, "stability", f"csi_max_train_to_{s}", worst["psi"],
-            grade(worst["psi"], w, f), w, f, rule,
+            m, "stability", f"csi_max_used_feature_train_to_{s}", worst["psi"],
+            grade(worst["psi"], w, f), w, f, rule + " (features used by the model only)",
             {"worst_feature": worst["feature"],
-             "n_features_above_warn": int((tab["psi"] > w).sum()),
-             "n_features_above_fail": int((tab["psi"] > f).sum()),
-             "top10": tab.head(10)}))
+             "n_used_features": int(len(tab_used)),
+             "n_used_above_warn": int((tab_used["psi"] > w).sum()),
+             "n_used_above_fail": int((tab_used["psi"] > f).sum()),
+             "top10_all_features": tab.head(10)}))
         for r in tab[tab["psi"] > w].itertuples():
-            out.append(make(m, "stability", f"csi_{r.feature}_train_to_{s}", r.psi,
-                            grade(r.psi, w, f), w, f, rule,
-                            {"missing_expected": r.missing_expected,
-                             "missing_actual": r.missing_actual}))
+            out.append(make(
+                m, "stability_detail", f"csi_{r.feature}_train_to_{s}", r.psi,
+                grade(r.psi, w, f) if r.used_by_model else "info", w, f,
+                rule if r.used_by_model else "diagnostic: feature not used by this model",
+                {"used_by_model": bool(r.used_by_model),
+                 "missing_expected": r.missing_expected, "missing_actual": r.missing_actual}))
 
     dr_train = ctx.y("train").mean()
     for s in ["valid", "oot"]:

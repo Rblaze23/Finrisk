@@ -3,6 +3,8 @@
 Every test returns TestResult objects:
     {"model", "test", "metric", "value", "status", "warn", "fail", "rule", "details"}
 status is one of: pass | warn | fail | info
+Tests whose name ends with "_detail" are feature-level diagnostics: they are stored and
+reported, but do not count in the headline totals.
 Results are written to results.validation_results (Postgres) and reports/validation_results.json.
 """
 from __future__ import annotations
@@ -24,7 +26,13 @@ THRESHOLDS = {
     "gini_drop_relative": (0.10, 0.20),      # relative Gini loss
     "gini_floor": (0.25, 0.15),              # minimum acceptable Gini (lower is worse)
     "psi": (0.10, 0.25),                     # population stability index
+    "vintage_gini_loss": (0.03, 0.10),       # Gini lost when vintage-sensitive features are removed
+    "single_feature_gini": (0.40, 0.50),     # a single input this predictive is suspicious
+    "explanation_rank_corr": (0.80, 0.60),   # rank correlation of feature importance (lower is worse)
+    "fairness_group_dev": (0.10, 0.20),      # group calibration vs overall calibration
+    "geo_importance_share": (0.02, 0.05),    # share of model importance on a geographic variable
 }
+LOWER_IS_WORSE = {"gini_floor", "explanation_rank_corr"}
 
 SPLITS = ["train", "valid", "oot", "monitor"]
 
@@ -42,6 +50,10 @@ class TestResult:
     fail: float | None = None
     rule: str = ""
     details: dict = field(default_factory=dict)
+
+    @property
+    def is_detail(self) -> bool:
+        return self.test.endswith("_detail")
 
     def to_dict(self) -> dict:
         return clean(asdict(self))

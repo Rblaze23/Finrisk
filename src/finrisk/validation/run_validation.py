@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import importlib
+import time
 from datetime import datetime
 
 import pandas as pd
@@ -28,8 +29,8 @@ from finrisk.validation import results as R
 pd.set_option("display.width", 180)
 pd.set_option("display.max_colwidth", 60)
 
-# executed in this order; a suite without a run() function is skipped (not built yet)
-SUITES = ["calibration", "out_of_time", "stability",
+# executed in this order; a suite without a run() function is skipped
+SUITES = ["calibration", "out_of_time", "stability", "sensitivity",
           "leakage", "explanation_stability", "fairness"]
 
 
@@ -60,33 +61,47 @@ def run_suites(ctx: R.ValidationContext) -> list[R.TestResult]:
         if fn is None:
             print(f"    - {name}: not implemented yet, skipped")
             continue
+        t0 = time.time()
         res = fn(ctx)
         results.extend(res)
-        print(f"    - {name}: {len(res)} results")
+        print(f"    - {name}: {len(res)} results ({time.time() - t0:.0f}s)")
     return results
 
 
 def summarize(results: list[R.TestResult]) -> None:
     df = pd.DataFrame([{"model": r.model, "test": r.test, "metric": r.metric,
-                        "value": r.value, "status": r.status, "rule": r.rule} for r in results])
-    counts = df.pivot_table(index="model", columns="status", values="metric",
-                            aggfunc="count", fill_value=0)
+                        "value": r.value, "status": r.status, "detail": r.is_detail}
+                       for r in results])
+    head = df[~df["detail"]]
+    counts = head.pivot_table(index="model", columns="status", values="metric",
+                              aggfunc="count", fill_value=0)
     for col in ["pass", "warn", "fail", "info"]:
         if col not in counts:
             counts[col] = 0
     print("\n" + "=" * 100)
-    print("VALIDATION SUMMARY (number of results by status)")
+    print("VALIDATION SUMMARY (headline results by status; feature-level diagnostics excluded)")
     print("=" * 100)
     print(counts[["pass", "warn", "fail", "info"]].to_string())
 
-    flagged = df[df["status"].isin(["warn", "fail"])].copy()
-    flagged["value"] = flagged["value"].map(lambda v: "n/a" if v is None else f"{v:.4f}")
-    flagged["sev"] = flagged["status"].map({"fail": 0, "warn": 1})
-    flagged = flagged.sort_values(["model", "sev", "test"]).drop(columns=["sev", "rule"])
+    def table(frame):
+        t = frame[frame["status"].isin(["warn", "fail"])].copy()
+        t["value"] = t["value"].map(lambda v: "n/a" if v is None else f"{v:.4f}")
+        t["sev"] = t["status"].map({"fail": 0, "warn": 1})
+        return t.sort_values(["model", "sev", "test"])[["model", "test", "metric", "value", "status"]]
+
+    flagged = table(head)
     print("\n" + "=" * 100)
     print("FINDINGS (warn / fail)")
     print("=" * 100)
     print(flagged.to_string(index=False) if len(flagged) else "none")
+
+    diag = table(df[df["detail"]])
+    if len(diag):
+        print("\n" + "=" * 100)
+        print(f"FEATURE-LEVEL DIAGNOSTICS flagged on features the model uses: {len(diag)} rows "
+              "(full list in the JSON)")
+        print("=" * 100)
+        print(diag.head(15).to_string(index=False))
 
 
 def main() -> None:
