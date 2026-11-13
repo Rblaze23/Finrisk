@@ -1,0 +1,12 @@
+# keep Docker build contexts small (the raw data alone is 1.6 GB)
+.venv
+.git
+data/raw
+data/regulatory_docs
+mlruns
+mlflow.db
+__pycache__
+*.pyc
+.pytest_cache
+*.bak
+notebooks

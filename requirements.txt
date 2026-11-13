@@ -1,0 +1,6 @@
+# Dependencies of the public DASHBOARD only (used by Streamlit Community Cloud).
+# The full project (training, validation, API) is installed with:  pip install -e .
+streamlit>=1.50
+pandas
+numpy
+altair

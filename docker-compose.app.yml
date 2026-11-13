@@ -1,0 +1,42 @@
+# Adds the scoring API and the dashboard on top of docker-compose.yml.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.app.yml up -d --build
+#
+# API:        http://localhost:8000/docs
+# Dashboard:  http://localhost:8501
+# (the plain `docker compose up -d` is unchanged: postgres + mlflow only)
+services:
+  mlflow:
+    environment:
+      # newer MLflow versions validate the Host header; allow the service name "mlflow"
+      MLFLOW_SERVER_ALLOWED_HOSTS: "*"
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: finrisk-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${POSTGRES_USER:-finrisk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finrisk}
+      POSTGRES_DB: ${POSTGRES_DB:-finrisk}
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dashboard
+    container_name: finrisk-dashboard
+    ports:
+      - "8501:8501"
+    restart: unless-stopped
