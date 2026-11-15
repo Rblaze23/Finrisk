@@ -11,7 +11,7 @@ dependencies = [
     "pandas", "numpy", "scikit-learn", "xgboost", "lightgbm", "shap",
     "mlflow>=3,<4", "fastapi", "uvicorn", "streamlit", "psycopg2-binary",
     "sqlalchemy", "python-dotenv", "pydantic", "scipy", "matplotlib",
-    "groq", "pytest", "httpx",
+    "groq", "pytest", "httpx", "markdown",
 ]
 
 [tool.setuptools.packages.find]

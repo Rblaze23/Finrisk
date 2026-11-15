@@ -24,3 +24,6 @@ mlflow.db
 .DS_Store
 .vscode/
 .idea/
+
+# LLM response cache
+.cache/

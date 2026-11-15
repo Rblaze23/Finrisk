@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-11-13T14:04:12",
+  "llm": {
+    "description": "deterministic templates (no LLM was used); every number comes straight from the results files.",
+    "provider": null,
+    "model": null
+  },
+  "guard": "every number and date in LLM prose must be supported by the section's facts",
+  "sections": [
+    {
+      "section": "executive_summary",
+      "source": "template",
+      "attempts": 0,
+      "prompt_sha256": null,
+      "rejected": []
+    },
+    {
+      "section": "discrimination",
+      "source": "template",
+      "attempts": 0,
+      "prompt_sha256": null,
+      "rejected": []
+    },
+    {
+      "section": "calibration",
+      "source": "template",
+      "attempts": 0,
+      "prompt_sha256": null,
+      "rejected": []
+    },
+    {
+      "section": "stability",
+      "source": "template",
+      "attempts": 0,
+      "prompt_sha256": null,
+      "rejected": []
+    },
+    {
+      "section": "explainability_fairness",
+      "source": "template",
+      "attempts": 0,
+      "prompt_sha256": null,
+      "rejected": []
+    },
+    {
+      "section": "monitoring",
+      "source": "template",
+      "attempts": 0,
+      "prompt_sha256": null,
+      "rejected": []
+    }
+  ]
+}
