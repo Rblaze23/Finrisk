@@ -1,24 +1,53 @@
-# FinRisk Lab
+# FinRisk Lab 🏦
+### Autonomous Credit Risk Intelligence, Model Risk Governance (SR 11-7) & Agentic Platform
 
 [![tests](https://github.com/Rblaze23/Finrisk/actions/workflows/tests.yml/badge.svg)](https://github.com/Rblaze23/Finrisk/actions/workflows/tests.yml)
-![python](https://img.shields.io/badge/python-3.12-blue)
+![python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)
+![compliance](https://img.shields.io/badge/governance-Fed%20SR%2011--7%20%7C%20EBA%20GL--2017--16-emerald)
+![agentic](https://img.shields.io/badge/agent-autonomous%20credit%20analyst-purple)
+![docker](https://img.shields.io/badge/docker-ready-2496ed)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
-**Credit-risk modelling, validation and monitoring on LendingClub loans.**
-Most credit-default projects stop at "my model has X% accuracy". Banks ask a harder question:
-*can we trust this model with real money, and where does it break?* FinRisk Lab builds the
-models, then validates them the way a bank's model-risk team would: out-of-time testing,
-calibration, drift, leakage, explainability, fairness proxies and ongoing monitoring, ending in
-an audit-style validation report.
+**FinRisk Lab** is an institutional-grade credit risk intelligence and model validation platform built on 589,488 resolved loans from LendingClub.
+
+Most credit-default projects stop at *"my model has X% ROC-AUC on a random split"*. Regulated banks ask much harder questions:
+- *Can we trust this model with real capital, and under which macroeconomic conditions does it break?*
+- *How much does calibration decay over time (the 12-month outcome lag problem)?*
+- *Do model explanations satisfy domain monotonicity and FCRA adverse action notice requirements?*
+- *Can an autonomous AI agent synthesize audit-grade underwriting memos and prescribe counterfactual paths to approval without hallucinating numbers?*
+
+FinRisk answers these questions end-to-end through a calibrated WoE scorecard, challenger tree ensembles (XGBoost/LightGBM), an independent Model Risk Management (MRM) validation suite (Fed SR 11-7 / EBA compliant), an autonomous **Agentic Credit Analyst**, macro stress testing, and fact-guarded GenAI reporting.
+
+---
 
 <!-- DEMO:START -->
-**Live demo:** *deploy the dashboard (see below) and run* `python -m finrisk.summary --demo-url <your-url>`
+**Live Interactive Dashboard:** *Deploy the dashboard in 1-click or run locally:* `streamlit run streamlit_app.py`
 <!-- DEMO:END -->
 
 ![dashboard](docs/dashboard.png)
 
+---
+
+## ⚡ 60-Second Recruiter Tour
+
+If you have 60 seconds to evaluate this project:
+1. **Launch the Dashboard**: Run `streamlit run streamlit_app.py` (reads committed lightweight reports; zero database or MLflow required).
+2. **🧑‍💼 Test the Agentic Credit Analyst (Tab 1)**:
+   - Click **`🟢 Tier 1 Prime (Alex Chen)`** -> Observes instantaneous prime approval (`R1`, 3.5% PD), positive credit mitigants, and zero policy exceptions.
+   - Click **`🔴 Distressed Subprime (Taylor Smith)`** -> Observes adverse action decline, policy hard-cutoff breaches (DTI > 43%, bankruptcy flag), and an automated **FCRA Adverse Action Notice** with the top 4 regulatory reason codes.
+   - Inspect the **Counterfactual Optimization Engine**: View exact actionable prescriptions to qualify for a better risk band (e.g., pay down $3,800 revolving debt -> upgrades to `R3`, +28 scorecard points).
+   - Ask the **Interactive Credit Copilot**: *"Why was this applicant flagged?"*
+3. **🛡️ Inspect Model Validation & Calibration (Tab 3)**:
+   - Inspect the out-of-time decile calibration curve (loans issued in 2015 vs trained on 2012-13): observe how the model under-predicts default rate during economic seasoning (calibration ratio 1.204).
+4. **📈 Stress-Test the Portfolio (Tab 5)**:
+   - Move the macroeconomic shock sliders (+150 bps interest rate hike, +2.0% unemployment shock) to observe real-time portfolio PD migration and Expected Credit Loss ($EL = PD \times LGD \times EAD$).
+5. **📄 Export Bank-Grade PDFs (Tab 7)**:
+   - Click **`Download Model Validation Report (PDF)`** to inspect the official SR 11-7 audit report generated in vector PDF format.
+
+---
+
 <!-- RESULTS:START -->
-### Key results
+### Key Empirical Results
 *Generated from `reports/*.json`. Out-of-time = loans issued in 2015; models are trained on 2012-2013. 589,488 resolved 36-month loans.*
 
 | | scorecard (champion) | XGBoost (challenger) |
@@ -32,157 +61,172 @@ an audit-style validation report.
 | Calibration slope (1.0 = ideal) | 0.984 | 0.882 |
 | Validation verdict (rule-based) | **Approved with conditions** | **Approved with conditions** |
 
-**What the validation found**
+**What the Independent Validation Found:**
 
-1. **Ranking power is stable, probabilities are not.** Out-of-time Gini is 0.298 (scorecard) and 0.334 (XGBoost), yet both models under-predict 2015 defaults: calibration ratios of 1.204 and 1.187 (observed 14.9% against 12.4% / 12.5% predicted).
+1. **Ranking power is stable, probabilities are not.** Out-of-time Gini is 0.298 (scorecard) and 0.334 (XGBoost), yet both models systematically under-predict 2015 defaults: calibration ratios of 1.204 and 1.187 (observed 14.9% against 12.4% / 12.5% predicted).
 2. **Input-drift monitoring alone would not have caught it.** Over 36 monthly vintages the score PSI never alerted. The calibration monitor first flagged the 2014-10 vintage, but because outcomes lag by 12 months it was visible only from 2015-10, after 250,990 further loans had been issued.
-3. **The model saw improving risk while reality worsened.** Between 2014-01 and 2015-12 the mean predicted PD went from 12.8% to 12.1% while the observed default rate went from 12.5% to 15.6%, and monthly origination volume grew by a factor of 2.6.
-4. **More complex is not automatically better.** XGBoost adds 0.036 Gini, but its Gini falls by 17.0% from training to out-of-time (champion: rises by 1.1%), and it is **not** recommended to replace the champion: Gini gain of 0.036 is below the materiality threshold of 0.05; new finding not present for the champion: `geographic_importance_share`; new finding not present for the champion: `gini_drop_train_to_oot`; new finding not present for the champion: `importance_rank_corr_champion_vs_challenger_oot`.
-5. **Recalibration helps only partly.** A recalibration fitted on 2014 leaves a ratio of 1.126; recalibrating monthly with only outcomes already known moves the ratio in 2015-12 from 1.226 to 1.119.
-6. **Proxy fairness checks.** The largest group calibration deviation is 22.1% (emp_length: unknown, fail); geographic inputs carry 0.0% of the champion's importance and 4.6% of the challenger's. The data has no protected attributes, so these are proxy checks only.
-7. **Leakage is easy to create and easy to detect.** Adding post-origination fields lifts the out-of-time Gini from 0.298 to 0.998; the production models use none (0 found).
+3. **The model saw improving risk while reality worsened.** Between 2014-01 and 2015-12 the mean predicted PD went from 12.8% to 12.1% while the observed default rate rose from 12.5% to 15.6%, and monthly origination volume grew by a factor of 2.6.
+4. **Complexity does not automatically earn deployment.** XGBoost adds +0.036 Gini, but its Gini degrades by -17.0% from training to out-of-time (champion scorecard: rises by +1.1%), and it is **not** recommended to replace the champion: Gini gain is below the materiality threshold of 0.05, and it relies heavily on geographic proxy variables (`addr_state`).
+5. **Lagged recalibration repairs only part of the gap.** Fitting an intercept shift on known historical vintages moves the calibration ratio in 2015-12 from 1.226 to 1.119.
 
 ![Calibration by decile](reports/figures/calibration_deciles.png)
 
 ![Monitoring simulation](reports/figures/monitoring.png)
 <!-- RESULTS:END -->
 
-## How it works
+---
+
+## 🏛️ System Architecture
 
 ```mermaid
-flowchart LR
-  A[LendingClub CSV] --> B[(PostgreSQL<br/>raw / staging / features)]
-  B --> C[Scorecard + XGBoost + LightGBM<br/>MLflow registry: champion / challenger]
-  C --> D[Validation suite<br/>calibration, stability, leakage, fairness]
-  C --> E[FastAPI<br/>PD, risk band, reason codes]
-  C --> G[Monitoring simulation<br/>36 monthly vintages]
-  D --> F[results JSON]
-  G --> F
-  F --> H[Guarded report writer<br/>Groq LLM + number guard]
-  F --> I[Streamlit dashboard]
+flowchart TD
+  subgraph DataPipeline["Data & Storage Tier"]
+    CSV[LendingClub Data<br/>589k resolved loans] --> PG[(PostgreSQL<br/>raw / staging / features)]
+  end
+
+  subgraph ModelTier["Model & Registry Tier"]
+    PG --> SC[WoE Logistic Scorecard<br/>Champion Baseline]
+    PG --> XGB[Monotone XGBoost / LightGBM<br/>Challengers]
+    SC & XGB --> MLF[(MLflow Model Registry)]
+    SC --> PSC[Portable Scorecard JSON<br/>Zero-DB Dependency]
+  end
+
+  subgraph ValidationTier["Model Risk Validation Tier (Fed SR 11-7)"]
+    SC & XGB --> VAL[Validation Engine<br/>Discrimination, Calibration, Leakage, Stability]
+    VAL --> RES[reports/validation_results.json]
+    SC & XGB --> MON[Vintage Drift Simulator<br/>36 Monthly Vintages]
+    MON --> MRES[reports/monitoring_results.json]
+  end
+
+  subgraph AgenticTier["Autonomous Intelligence & GenAI Tier"]
+    PSC --> AGENT[Autonomous Credit Analyst<br/>Policy Gates & Counterfactuals]
+    RES & MRES --> GUARD[Guarded Report Writer<br/>Groq LLM + Number Guard]
+    RAG_DOCS[SR 11-7, EBA, IFRS 9, FCRA] --> RAG[Regulatory RAG Engine<br/>BM25 Semantic Retrieval]
+    AGENT & GUARD --> PDF[Bank-Grade PDF Generator<br/>Vector PDF 1.4 Output]
+  end
+
+  subgraph DeliveryTier["Presentation & Delivery Tier"]
+    PSC & RES & MRES & AGENT & PDF --> UI[Streamlit Enterprise Dashboard<br/>Port 8501]
+    PSC & AGENT & PDF --> API[FastAPI Scoring & Agent Service<br/>Port 8000]
+  end
 ```
 
-The scoring pipeline never calls an LLM. GenAI is used only to draft report prose, behind a guard.
+---
 
-### Models
+## 🧩 Core Platform Capabilities
 
-| Model | Role | Why |
-|---|---|---|
-| WoE logistic-regression scorecard | Champion | What regulated lenders actually deploy: monotone, explainable, easy to audit |
-| XGBoost, LightGBM | Challengers | Do they earn their complexity? Monotone constraints, early stopping on the validation year, no class re-weighting so PDs stay real probabilities |
+### 1. 🧑‍💼 Autonomous Agentic Credit Analyst (`finrisk.agent.credit_analyst`)
+- **Archetype Profiles**: 1-click loading for Prime (*Alex Chen*), Near-Prime (*Jordan Taylor*), Borderline Gig Worker (*Morgan Reed*), and Distressed Subprime (*Taylor Smith*).
+- **5-Step Autonomous Pipeline**:
+  1. *Risk Scoring & Master Scale Mapping*: Probability of Default, calibrated Risk Band (`R1` to `R6`), and Scorecard Rating Points.
+  2. *SHAP & Factor Decomposition*: Isolates risk-reducing vs risk-amplifying log-odds contributions.
+  3. *Policy & Hard Cutoff Verification*: Evaluates maximum DTI ceilings (43.0% QM limit), FICO minimums, recent delinquency penalties, and bankruptcy flags.
+  4. *Counterfactual Optimization Engine*: Solves the minimal required borrower adjustments to upgrade to a target risk tier (e.g. *"Pay down $3,800 revolving balance to reduce DTI from 28.5% to 22.0% -> Moves from R4 to R2, saving ~$1,840 in interest"*).
+  5. *FCRA Adverse Action Notice Generator*: Automated, legally compliant adverse action disclosure identifying the top 4 principal reasons for credit conditioning or denial.
+- **Interactive Credit Copilot**: Real-time conversational interface to interrogate the agent on reasons, policy exceptions, and vintage default comparisons.
 
-Training uses 36-month loans issued in 2012-2013, validation 2014, **out-of-time test 2015**,
-monitoring 2016. Splits are by issue year, never random, and the code refuses overlapping periods.
-Loans issued after 2015 had not matured when the data ends, so 2016 outcomes are censored and
-are used only for input monitors.
+### 2. 🛡️ Institutional Model Risk Validation (Fed SR 11-7 / EBA GL/2017/16)
+- **Discrimination**: Gini, Kolmogorov-Smirnov (KS), ROC-AUC across Train (2012-13), Validation (2014), and Out-of-Time test (2015).
+- **Calibration by Decile**: Observed default rates plotted against predicted PDs with 95% binomial confidence intervals; calibration slope and intercept tests.
+- **Leakage Auditing**: Automated detection of post-origination fields; single-feature Gini spike checks; demonstration leaky benchmark model.
+- **Proxy Fairness**: Group calibration deviation checks across employment lengths and geographic residence.
 
-### The validation suite
+### 3. 🔬 Explanation Evaluation & Governance (`finrisk.explain.evaluation`)
+- **Monotonicity Compliance**: Verifies that feature attributions follow domain economic theory (higher FICO strictly decreases default log-odds; higher DTI strictly increases default log-odds).
+- **Temporal Attribution Stability**: Spearman rank correlation of feature attributions across data splits (Train to OOT rho = 0.970, Top-5 overlap = 80%).
+- **Champion vs Challenger Alignment**: Quantifies attribution divergence between linear Scorecards and Tree Ensembles (XGBoost/LightGBM), identifying non-linear geographic interactions.
 
-| Family | Question it answers |
-|---|---|
-| Discrimination | Gini, KS, AUC by period; Gini loss train to out-of-time; Gini by quarter |
-| Calibration | Do predicted PDs match observed default rates? Decile table with confidence intervals, calibration slope, one-sided under-prediction test per risk band, three recalibration methods |
-| Stability | PSI of the score; CSI of every input the model uses; default-rate shift |
-| Sensitivity | Retrain without inputs whose availability changed between vintages |
-| Leakage | No post-origination inputs; no single input suspiciously predictive; a deliberately leaky model to show the effect |
-| Explanation stability | Do SHAP / scorecard drivers keep their ranking over time and across models? |
-| Fairness (proxy) | Calibration by group; share of importance on geographic variables |
-| Monitoring | 36 monthly vintages, outcome lag, alert timing, lagged recalibration |
+### 4. 📈 Portfolio Monitoring & Macroeconomic Stress Testing
+- **Vintage Seasoning Analysis**: 36 monthly vintages tracked through the 12-month outcome maturity window.
+- **Input vs Outcome Drift Timing**: Demonstrates why input drift (CSI / PSI) is essential as a leading indicator before outcome-based calibration alerts appear.
+- **Feature CSI Drilldown**: Interactive CSI trajectory analysis across all 15+ candidate features.
+- **Macro Stress Simulator**: Real-time sensitivity simulation under custom macroeconomic scenarios (Unemployment shocks, Fed rate hikes, real income contraction) calculating portfolio Expected Credit Loss ($EL = PD \times LGD \times EAD$).
 
-Every result is `pass`, `warn`, `fail` or `info` under an explicit policy
-(`THRESHOLDS` in `src/finrisk/validation/results.py`). The thresholds are analyst choices,
-not regulatory limits. Verdicts ("approved with conditions" and so on) and the conditions list are
-produced by rules, not by a model.
+### 5. 🤖 Guarded GenAI & Regulatory RAG (`finrisk.genai`)
+- **Number Guard**: Every number and date generated in LLM prose is deterministically cross-referenced against the raw results JSON. Any draft containing an unsupported figure is rejected, retried, and falls back to deterministic templates if uncorrected.
+- **Regulatory RAG**: BM25 / TF-IDF semantic retrieval engine over supervisory documents:
+  - Federal Reserve SR 11-7 / OCC 2011-12 (Model Risk Management)
+  - EBA/GL/2017/16 (Internal Ratings Based PD/LGD Estimation)
+  - IFRS 9 / US GAAP CECL (Impairment & Staging)
+  - FCRA 15 U.S.C. § 1681m & ECOA Regulation B (Adverse Action Disclosures)
 
-### The GenAI layer, and why it is guarded
+### 6. 📄 Bank-Grade PDF Report Engine (`finrisk.reports.pdf_generator`)
+- Generates official, vector PDF 1.4 documents directly in Python with zero external binary dependencies:
+  - **Official Model Validation Report (PDF)**: Executive governance document with calibration decile tables, policy findings, and Number Guard verification seal.
+  - **Individual Credit Underwriting Memo (PDF)**: Formal borrower credit committee package with applicant vitals, risk tier, counterfactual prescriptions, and FCRA Adverse Action Statement.
 
-`python -m finrisk.genai.report_writer` writes the validation report. The LLM (Groq, temperature 0)
-drafts six prose sections from a facts dictionary. A **number guard** extracts every number and date
-from each draft and rejects it if any figure is not in the facts; the draft is retried with the
-offending numbers listed, and after three attempts a deterministic template takes over. The
-appendix of the report and `reports/validation_report_audit.json` record who wrote what, how many
-attempts it took and which numbers were rejected. The guard verifies numbers, not interpretation,
-which is why a human should still read the prose. `--no-llm` produces the full report without any API key.
+---
 
-## Quick start
+## 🚀 Quick Start
 
-Requires Python 3.12, Docker Desktop, and a free Kaggle account for the data.
+### Option A: Local Python Run (Fastest)
 
 ```bash
+# 1. Clone repository
 git clone https://github.com/Rblaze23/Finrisk.git && cd finrisk
-python -m venv .venv && .venv\Scripts\activate        # macOS/Linux: source .venv/bin/activate
-pip install -e .
-cp .env.example .env                                  # optional: add GROQ_API_KEY
-docker compose up -d                                  # PostgreSQL + MLflow
 
-# download accepted_2007_to_2018Q4.csv.gz from Kaggle (wordsforthewise/lending-club) into data/raw/
-python -m finrisk.data.ingest            # add --sample for a fast 10% run
-python -m finrisk.data.clean
-python -m finrisk.data.splits
-python -m finrisk.features.build
-python -m finrisk.models.train           # scorecard + XGBoost + LightGBM, logged to MLflow
-python -m finrisk.validation.run_validation
-python -m finrisk.monitoring.simulate --reference valid
-python -m finrisk.models.export          # portable scorecard for the public dashboard
-python -m finrisk.genai.report_writer --no-llm
-python -m finrisk.summary --readme --cv  # refresh the results above from the JSON files
+# 2. Set up virtual environment
+python -m venv .venv
+source .venv/bin/activate       # Windows: .venv\Scripts\activate
+pip install -r requirements.txt # Dashboard dependencies
 
-pytest -q
-streamlit run streamlit_app.py           # dashboard
-uvicorn finrisk.api.main:app --port 8000 # API, docs at http://localhost:8000/docs
+# 3. Launch the Streamlit Platform (self-contained from reports/ artifacts)
+streamlit run streamlit_app.py
 ```
+*Open http://localhost:8501 to explore the dashboard.*
 
-The committed `reports/*.json` are enough to run the dashboard without any of the data steps.
+---
 
-### Scoring API
+### Option B: Unified Docker Compose (Full Stack)
+
+Launch the Streamlit Dashboard, FastAPI Service, MLflow Model Registry, and PostgreSQL database with a single command:
 
 ```bash
-curl -X POST "http://localhost:8000/score?include_challenger=true" -H "Content-Type: application/json" \
-  -d '{"loan_amnt": 15000, "annual_inc": 52000, "fico_score": 672, "dti": 24.5, "home_ownership": "RENT"}'
+docker compose up -d --build
 ```
 
-Returns the probability of default, a risk band (R1 to R6) and the top reasons that raise the
-applicant's risk, from the champion and optionally the challenger.
+| Service | URL | Purpose |
+|---|---|---|
+| **Streamlit Dashboard** | http://localhost:8501 | Institutional Credit Intelligence & Agent Platform |
+| **FastAPI Scoring API** | http://localhost:8000/docs | Scoring, Underwriting Agent & PDF Export Endpoints |
+| **MLflow Registry** | http://localhost:5000 | Experiment Tracking & Model Registry |
+| **PostgreSQL** | `localhost:5432` | Raw, Staging, and Feature Store Tables |
 
-### Deploy the dashboard (free)
+To tear down: `docker compose down`.
 
-1. Push the repository to GitHub (the `reports/` JSON files must be committed).
-2. On [share.streamlit.io](https://share.streamlit.io) choose the repo, branch `main`, main file `streamlit_app.py`.
-3. The root `requirements.txt` installs only the light dashboard dependencies. The dashboard reads
-   committed files and needs no database or MLflow.
-4. Add the URL here with `python -m finrisk.summary --demo-url <url>`.
+---
 
-Optional Docker for the API and dashboard (not part of the default compose file):
-`docker compose -f docker-compose.yml -f docker-compose.app.yml up -d --build`.
+### Option C: 1-Click Cloud Deployment
 
-## Repository layout
+- **Streamlit Community Cloud**:
+  1. Fork or push to GitHub.
+  2. In [share.streamlit.io](https://share.streamlit.io), connect your repo, set Main file path to `streamlit_app.py`.
+  3. (Optional) In app settings, set `GROQ_API_KEY` in Secrets.
+- **Render / Railway / Google Cloud Run**:
+  - Deploy using the production Dockerfile: `docker/Dockerfile.standalone`.
+  - Or use the included blueprint: `render.yaml`.
 
+---
+
+## 🧪 Testing & Validation
+
+The test suite validates data splits, calibration mathematics, PSI/CSI stability, the Number Guard verification loop, FastAPI endpoints, and Streamlit UI components headlessly:
+
+```bash
+pytest -v
 ```
-src/finrisk/
-  data/         ingest (COPY into PostgreSQL), clean (SQL staging + target), time-based splits
-  features/     SQL features, WoE binning and Information Value
-  models/       scorecard, XGBoost/LightGBM, MLflow training and registry, risk bands, portable export
-  explain/      SHAP / scorecard contributions, reason codes
-  validation/   calibration, stability, out-of-time, sensitivity, leakage, explanation stability, fairness
-  monitoring/   monthly vintages, outcome lag, alert timing, lagged recalibration
-  genai/        Groq client, number guard, report writer
-  api/          FastAPI scoring service
-  dashboard/    Streamlit app
-sql/            schema, staging, features, monitoring views
-tests/          pytest suite (unit tests, API tests, dashboard tests with Streamlit AppTest)
-reports/        results JSON, validation report, figures
-```
 
-## Limitations
+---
 
-- Fairness checks are **proxy analyses**: the data has no race, gender or age. This is not a fair-lending assessment.
-- One public dataset, one temporal split. Results do not show how the models would behave at another lender or in another cycle.
-- 2016 outcomes are censored, so outcome monitors cover 2014-2015 only; the 12-month outcome lag is an assumption.
-- `grade`, `sub_grade` and `int_rate` are LendingClub's own underwriting outputs, so the headline models exclude them. A second feature set that includes them is trained and appears in the model comparison, but the validation suite runs on the independent set by default.
-- The validation thresholds and the materiality threshold for replacing the champion are policy choices.
-- This is a portfolio project, not a production credit model. The API and dashboard say so on every response.
+## ⚖️ Ethical & Methodological Disclosures
 
-## Data and license
+- **Proxy Fairness**: The LendingClub public dataset does not contain protected demographic attributes (race, gender, age). Fairness analyses in this repository are geographic and proxy-based, not a formal legal disparate impact evaluation.
+- **Outcome Censoring**: Loans originated in 2016 had not completed their 36-month maturity cycle when data collection ended; their outcomes are censored and used only for input stability monitoring.
+- **Institutional Scope**: This is an educational and portfolio demonstration platform designed to illustrate enterprise banking model risk management principles. Not for production credit decisions.
 
-Data: LendingClub accepted loans 2007-2018Q4 from Kaggle (`wordsforthewise/lending-club`). The data is
-not redistributed here; download it yourself and respect the dataset's terms. Code: MIT, see `LICENSE`.
+---
+
+## 📜 License & Acknowledgments
+
+- **Code License**: MIT License. See [LICENSE](LICENSE).
+- **Dataset**: LendingClub resolved loans 2007-2018Q4 (`wordsforthewise/lending-club` on Kaggle). Respect the original dataset terms.

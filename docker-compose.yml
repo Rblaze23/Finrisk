@@ -1,8 +1,42 @@
-# FinRisk Lab - local infrastructure.
-# Phase 0: postgres + mlflow. The api and dashboard services are added in Phase 5.
+# FinRisk Lab - Unified Multi-Service Docker Architecture
+#
+#   docker compose up -d --build
+#
+# Services:
+#   - dashboard:  http://localhost:8501   (Streamlit Institutional Platform)
+#   - api:        http://localhost:8000/docs (FastAPI Scoring & Underwriting Service)
+#   - mlflow:     http://localhost:5000   (MLflow Model Registry)
+#   - postgres:   localhost:5432          (PostgreSQL Database)
 name: finrisk
 
 services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dashboard
+    container_name: finrisk-dashboard
+    environment:
+      FINRISK_REPORTS_DIR: /app/reports
+    ports:
+      - "8501:8501"
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: finrisk-api
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${POSTGRES_USER:-finrisk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finrisk}
+      POSTGRES_DB: ${POSTGRES_DB:-finrisk}
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
   postgres:
     image: postgres:16
     container_name: finrisk-postgres
@@ -14,7 +48,6 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      # Init scripts run once, on first start of an empty volume, in file-name order.
       - ./docker/initdb/00_create_mlflow_db.sql:/docker-entrypoint-initdb.d/00_create_mlflow_db.sql:ro
       - ./sql/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
     healthcheck:
@@ -32,6 +65,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    environment:
+      MLFLOW_SERVER_ALLOWED_HOSTS: "*"
     ports:
       - "5000:5000"
     command: >

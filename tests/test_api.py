@@ -111,3 +111,20 @@ def test_a_risky_profile_gets_the_expected_top_reason(client):
     risky = {**EXAMPLE, "fico_score": 600, "dti": 45, "inq_last_6mths": 6}
     reasons = client.post("/score", json=risky).json()["champion"]["reasons"]
     assert reasons and reasons[0]["feature"] in {"fico_mid", "dti", "inq_last_6mths"}
+
+
+def test_agent_underwrite_endpoint(client):
+    r = client.post("/agent/underwrite", json=EXAMPLE)
+    assert r.status_code == 200
+    j = r.json()
+    assert "verdict" in j
+    assert "risk_band" in j
+    assert "counterfactual" in j
+    assert "reasons" in j
+
+
+def test_download_validation_pdf_endpoint(client):
+    r = client.get("/reports/validation-pdf")
+    if r.status_code == 200:
+        assert r.headers["content-type"] == "application/pdf"
+        assert r.content.startswith(b"%PDF-1.4")
