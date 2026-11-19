@@ -24,7 +24,9 @@ FinRisk answers these questions end-to-end through a calibrated WoE scorecard, c
 **Live Interactive Dashboard:** *Deploy the dashboard in 1-click or run locally:* `streamlit run streamlit_app.py`
 <!-- DEMO:END -->
 
-![dashboard](docs/dashboard.png)
+![FinRisk Lab Animated Product Showcase](docs/demo.gif)
+
+*Full interactive showcase & chapters: [docs/demo.html](docs/demo.html)*
 
 ---
 
@@ -116,6 +118,9 @@ flowchart TD
 ## 🧩 Core Platform Capabilities
 
 ### 1. 🧑‍💼 Autonomous Agentic Credit Analyst (`finrisk.agent.credit_analyst`)
+
+![agentic_analyst](docs/agentic_analyst.png)
+
 - **Archetype Profiles**: 1-click loading for Prime (*Alex Chen*), Near-Prime (*Jordan Taylor*), Borderline Gig Worker (*Morgan Reed*), and Distressed Subprime (*Taylor Smith*).
 - **5-Step Autonomous Pipeline**:
   1. *Risk Scoring & Master Scale Mapping*: Probability of Default, calibrated Risk Band (`R1` to `R6`), and Scorecard Rating Points.
