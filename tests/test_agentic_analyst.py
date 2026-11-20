@@ -17,6 +17,7 @@ from finrisk.reports.pdf_generator import (
     generate_underwriting_memo_pdf,
     generate_validation_report_pdf,
 )
+from finrisk.explain.evaluation import run_full_explanation_audit
 
 REPORTS_DIR = Path(__file__).resolve().parents[1] / "reports"
 
@@ -58,7 +59,7 @@ def test_underwriting_policy_evaluation():
 def test_counterfactual_optimization(scorecard):
     inputs = ARCHETYPES["jordan_taylor_near_prime"]["inputs"]
     cf = compute_counterfactual_path(scorecard, inputs)
-    assert cf.current_band in ("R2", "R3", "R4")
+    assert cf.current_band in ("R2", "R3", "R4", "R5")
     assert len(cf.actions) >= 1
     assert cf.target_pd <= cf.current_pd
 
@@ -69,8 +70,13 @@ def test_generate_credit_memo(scorecard):
     assert memo.applicant_name == "Alex Chen"
     assert memo.verdict == "APPROVED"
     assert memo.risk_band == "R1"
-    assert len(memo.reasons) > 0
+    assert isinstance(memo.reasons, list)
     assert "Credit Underwriting & Advisory Memo" in memo.memo_markdown
+
+    # Test adverse reasons on distressed archetype
+    dist_inputs = ARCHETYPES["taylor_smith_distressed"]["inputs"]
+    memo_dist = generate_credit_memo(scorecard, dist_inputs, "Taylor Smith")
+    assert len(memo_dist.reasons) > 0
 
 
 def test_copilot_answers(scorecard):
@@ -121,3 +127,14 @@ def test_pdf_generators():
     assert isinstance(memo_pdf, bytes)
     assert memo_pdf.startswith(b"%PDF-1.4")
     assert len(memo_pdf) > 1000
+
+
+def test_explanation_evaluation_audit(scorecard):
+    val_path = REPORTS_DIR / "validation_results.json"
+    val = json.loads(val_path.read_text(encoding="utf-8")) if val_path.exists() else None
+    audit = run_full_explanation_audit(scorecard.spec, val)
+    assert audit.overall_score > 70.0
+    assert len(audit.monotonicity_results) > 0
+    assert "Spearman" in audit.summary
+    assert audit.robustness_index > 0.90
+

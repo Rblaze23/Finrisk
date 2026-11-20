@@ -306,7 +306,7 @@ def generate_underwriting_memo_pdf(memo: Any, inputs: dict[str, Any]) -> bytes:
         ["Debt-to-Income (DTI)", f"{inputs.get('dti', 0):.1f}%", "Max 43.0% (warn > 36%)", "PASS" if inputs.get('dti', 0) <= 36.0 else "WARN"],
         ["Credit Inquiries (6m)", f"{inputs.get('inq_last_6mths', 0):.0f}", "Max 3 velocity check", "PASS" if inputs.get('inq_last_6mths', 0) < 3 else "WARN"],
     ]
-    pdf.draw_table(vitals_rows, [140.0, 110.0, 140.0, 114.0])
+    pdf.draw_table(headers, vitals_rows, [140.0, 110.0, 140.0, 114.0])
 
     pdf.draw_section_header("3. Top Adverse Risk Factors (FCRA Compliant Reason Codes)")
     reason_rows = [

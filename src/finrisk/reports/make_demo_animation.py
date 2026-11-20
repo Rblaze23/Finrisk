@@ -220,7 +220,7 @@ def build_full_animation() -> Path:
         title="Real-Time Risk Scoring & Calibrated Scorecard",
         subtitle="Evaluates borrower PD, Master Scale Band (R1-R6), and points with zero database dependency.",
         duration_frames=30,
-        cursor_start=(300, 150), cursor_end=(500, 150)
+        cursor_start=(320, 130), cursor_end=(480, 130)
     ))
 
     # 3. Autonomous Agentic Analyst (Prime Underwriting)
@@ -230,7 +230,7 @@ def build_full_animation() -> Path:
         title="Autonomous Agentic Credit Underwriter",
         subtitle="Autonomous 5-step underwriting: Risk Scoring, Bank Policy Gates, Mitigants, and Underwriting Memo.",
         duration_frames=30,
-        cursor_start=(150, 80), cursor_end=(320, 80)
+        cursor_start=(320, 130), cursor_end=(540, 220)
     ))
 
     # 4. Counterfactual Path-to-Approval
@@ -240,27 +240,27 @@ def build_full_animation() -> Path:
         title="Counterfactual Optimization Engine",
         subtitle="Prescribes exact minimal actions (e.g. pay down $3,800 revolving debt) to upgrade tier & qualify for approval.",
         duration_frames=30,
-        cursor_start=(550, 400), cursor_end=(700, 400)
+        cursor_start=(480, 290), cursor_end=(640, 290)
     ))
 
     # 5. Model Validation (SR 11-7) & Deciles
     print("  - Rendering Scene 5: Independent Model Risk Validation (SR 11-7)")
-    all_frames.extend(make_composite_scene(
-        DOCS / "calibration_deciles.png", step_num=4,
+    all_frames.extend(make_scene_from_image(
+        DOCS / "validation_ui.png", step_num=4,
         title="Model Risk Validation (Fed SR 11-7 / EBA Compliant)",
         subtitle="Uncovers out-of-time calibration decay: 2015 defaults rose to 14.9% vs 12.4% predicted (1.204 ratio).",
-        header_text="🛡️ Fed SR 11-7 Model Validation: Out-of-Time Decile Calibration Curve (95% CI)",
-        duration_frames=30
+        duration_frames=30,
+        cursor_start=(100, 200), cursor_end=(420, 100)
     ))
 
     # 6. Portfolio Monitoring & Macro Stress Testing
     print("  - Rendering Scene 6: Portfolio Monitoring & Macro Shocks")
-    all_frames.extend(make_composite_scene(
-        DOCS / "monitoring.png", step_num=5,
-        title="Portfolio Monitoring Simulation & The 12-Month Outcome Lag",
-        subtitle="Monitors 36 monthly vintages; demonstrates why input drift (CSI/PSI) must serve as a leading indicator.",
-        header_text="📈 Monthly Vintage Monitoring Simulation: Input Drift vs Realized Default Rates",
-        duration_frames=30
+    all_frames.extend(make_scene_from_image(
+        DOCS / "monitoring_ui.png", step_num=5,
+        title="Portfolio Monitoring Simulation & Macro Stress Testing",
+        subtitle="Monitors 36 monthly vintages and dynamically simulates portfolio Expected Credit Loss under rate shocks.",
+        duration_frames=30,
+        cursor_start=(400, 240), cursor_end=(650, 240)
     ))
 
     # 7. Outro

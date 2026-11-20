@@ -117,6 +117,19 @@ def missing_file_warning(name: str, command: str) -> None:
     st.warning(f"`reports/{name}` not found. Create it with: `{command}`")
 
 
+def get_active_llm():
+    """Return GroqLLM if configured and available, else None."""
+    api_key = os.environ.get("GROQ_API_KEY", "").strip()
+    if not api_key or api_key == "your_key_here":
+        return None
+    try:
+        from finrisk.genai.groq_client import GroqLLM
+        model_name = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+        return GroqLLM(api_key=api_key, model=model_name)
+    except Exception:
+        return None
+
+
 # -----------------------------------------------------------------------------
 # Styling
 # -----------------------------------------------------------------------------
@@ -190,8 +203,9 @@ def page_agentic_analyst() -> None:
             "credit_history_years": float(hist), "purpose": purpose,
         })
 
+    active_llm = get_active_llm()
     # Run Autonomous Underwriting
-    memo = generate_credit_memo(model, cur_inputs, applicant_name=cur_name)
+    memo = generate_credit_memo(model, cur_inputs, applicant_name=cur_name, llm=active_llm)
 
     st.markdown("---")
     st.subheader(f"2. Agent Underwriting Verdict: {cur_name}")
@@ -243,12 +257,64 @@ def page_agentic_analyst() -> None:
             st.code(memo.adverse_action_notice, language="text")
 
     with t_copilot:
-        st.markdown("### In-App Credit Copilot")
-        st.caption("Ask questions about this borrower, underwriting decisions, or portfolio comparisons.")
-        c_q = st.text_input("Ask the Credit Analyst Agent:", "Why was this applicant flagged?")
-        if st.button("Submit Query", key="btn_copilot"):
-            ans = copilot_answer(c_q, memo, cur_inputs)
-            st.write(ans)
+        st.markdown("### Interactive Credit Copilot & Conversational Underwriting")
+        st.caption("Interrogate the AI credit officer regarding risk drivers, what-if scenarios, policy mitigants, and counterfactuals.")
+
+        if active_llm is not None:
+            st.success(f"🟢 **Live LLM Active:** Groq (`{active_llm.model}`) with Number Guard verification.")
+        else:
+            st.info("🧠 **Intelligent Credit Reasoning Engine (Offline Mode)**: Delivering contextual financial analysis without external API dependencies. Enter a free Groq API key in the sidebar for live LLM mode.")
+
+        # Initialize session chat history if not present or switched applicant
+        if "copilot_chat" not in st.session_state or st.session_state.get("copilot_applicant") != cur_name:
+            st.session_state["copilot_applicant"] = cur_name
+            top_f = memo.reasons[0]['label'] if memo.reasons else 'debt leverage'
+            st.session_state["copilot_chat"] = [
+                {
+                    "role": "assistant",
+                    "content": (
+                        f"Hello, I am your Credit Risk Underwriting Copilot. I have analyzed **{cur_name}**'s credit file. "
+                        f"Final Determination: **{memo.verdict}** (Tier **{memo.risk_band}**, Probability of Default: **{memo.probability_of_default:.1%}**, "
+                        f"Scorecard Points: **{memo.scorecard_points:.0f}**). "
+                        f"The primary risk factor is `{top_f}`. How can I assist you with this credit decision?"
+                    )
+                }
+            ]
+
+        # Display conversational chat history
+        for msg in st.session_state["copilot_chat"]:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+
+        # Quick question chips
+        st.markdown("**Quick Inquiries:**")
+        chip_cols = st.columns(4)
+        quick_q = None
+        if chip_cols[0].button("🔍 Why this verdict?", key="chip_why", use_container_width=True):
+            quick_q = "Why was this applicant flagged and assigned this risk band?"
+        if chip_cols[1].button("📈 What if income +15%?", key="chip_inc", use_container_width=True):
+            quick_q = "What happens to the default probability if stated income increases by 15%?"
+        if chip_cols[2].button("🎯 How to upgrade tier?", key="chip_upgrade", use_container_width=True):
+            quick_q = "What specific counterfactual actions can this borrower take to qualify for an upgrade?"
+        if chip_cols[3].button("🤝 Could a co-signer help?", key="chip_cosign", use_container_width=True):
+            quick_q = "Could adding a creditworthy co-signer or collateral overturn a decline?"
+
+        # Chat input bar
+        user_input = st.chat_input("Ask Credit Copilot a question about this applicant...")
+        prompt_to_run = quick_q or user_input
+
+        if prompt_to_run:
+            st.session_state["copilot_chat"].append({"role": "user", "content": prompt_to_run})
+            with st.chat_message("user"):
+                st.markdown(prompt_to_run)
+
+            with st.spinner("Analyzing credit risk dynamics..."):
+                response = copilot_answer(prompt_to_run, memo, cur_inputs, llm=active_llm)
+
+            st.session_state["copilot_chat"].append({"role": "assistant", "content": response})
+            with st.chat_message("assistant"):
+                st.markdown(response)
+            st.rerun()
 
 
 # -----------------------------------------------------------------------------
@@ -558,10 +624,16 @@ def page_genai_rag() -> None:
 
     with t_rag:
         st.subheader("Supervisory Standards Knowledge Retrieval")
+        active_llm = get_active_llm()
+        if active_llm is not None:
+            st.caption(f"🟢 Grounded RAG synthesized by Live Groq LLM (`{active_llm.model}`).")
+        else:
+            st.caption("🧠 Grounded RAG running via BM25 Semantic Retrieval Engine.")
+
         reg_query = st.text_input("Enter compliance or model risk question:",
                                   "What are the ongoing monitoring requirements under Fed SR 11-7?")
         if st.button("Search Regulations", key="btn_reg_search"):
-            ans = answer_regulatory_question(reg_query)
+            ans = answer_regulatory_question(reg_query, llm=active_llm)
             st.markdown(f"### Regulatory Finding\n{ans['answer']}")
             st.markdown("### Grounded Citations")
             for src in ans["sources"]:
@@ -662,12 +734,22 @@ def main() -> None:
 
     # Sidebar Groq Key & Mode configuration
     with st.sidebar.expander("🔑 LLM / Groq Key Settings", expanded=False):
-        api_key_input = st.text_input("Groq API Key (Optional)", type="password",
-                                      help="Leave blank to use .env key or deterministic fallback.")
+        api_key_input = st.text_input(
+            "Groq API Key",
+            type="password",
+            value=os.environ.get("GROQ_API_KEY", "") if os.environ.get("GROQ_API_KEY") != "your_key_here" else "",
+            help="Free key from console.groq.com. Leave empty to run the offline reasoning engine."
+        )
         if api_key_input:
-            os.environ["GROQ_API_KEY"] = api_key_input
+            os.environ["GROQ_API_KEY"] = api_key_input.strip()
         groq_model = st.selectbox("LLM Model", ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"])
         os.environ["GROQ_MODEL"] = groq_model
+
+        active_llm = get_active_llm()
+        if active_llm is not None:
+            st.success("🟢 Live Groq LLM Connected")
+        else:
+            st.info("🧠 Offline Reasoning Engine Active")
 
     page = st.sidebar.radio("Navigation", PAGES)
     st.sidebar.divider()
