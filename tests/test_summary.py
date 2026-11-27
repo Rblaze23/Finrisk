@@ -121,4 +121,4 @@ def test_github_slug(url, slug):
 def test_shipped_readme_has_the_markers_and_no_unfilled_braces():
     text = (S.PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
     assert S.START in text and S.END in text and S.DEMO_START in text and S.DEMO_END in text
-    assert "mermaid" in text and "Limitations" in text
+    assert "mermaid" in text and "Ethical & Methodological Disclosures" in text

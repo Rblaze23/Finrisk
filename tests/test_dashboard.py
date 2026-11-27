@@ -76,7 +76,7 @@ def _app(reports, monkeypatch, page):
     at = AppTest.from_file(str(APP), default_timeout=90).run()
     full_page = PAGE_MAP.get(page, page)
     if full_page != "🧑‍💼 Agentic Credit Analyst":
-        at.sidebar.radio[1].set_value(full_page).run()
+        at.sidebar.radio[0].set_value(full_page).run()
     return at
 
 
@@ -141,6 +141,6 @@ def test_missing_report_files_give_a_helpful_warning_not_a_crash(tmp_path, monke
         at = AppTest.from_file(str(APP), default_timeout=60).run()
         full_page = PAGE_MAP.get(page, page)
         if full_page != "🧑‍💼 Agentic Credit Analyst":
-            at.sidebar.radio[1].set_value(full_page).run()
+            at.sidebar.radio[0].set_value(full_page).run()
         assert not at.exception, page
         assert any("not found" in w.value for w in at.warning), page
